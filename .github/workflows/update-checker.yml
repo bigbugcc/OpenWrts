@@ -37,7 +37,7 @@ jobs:
       if: steps.cacheHash.outputs.cache-hit != 'true'
       uses: peter-evans/repository-dispatch@v1
       with:
-        token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+        token: ${{ secrets.OP_ACTIONS_TRIGGER_PAT }}
         event-type: Source Code Update
 
     - name: Delete workflow runs

@@ -1,4 +1,4 @@
-name: NanoPi R2S
+name: Raspberry Pi3B+
 
 on:
   repository_dispatch:
@@ -10,11 +10,11 @@ on:
         default: 'false'
 
 env:
-  OPNAME: NanoPi R2S
+  OPNAME: 'Raspberry Pi3B+'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: configs/R2S.config
+  CONFIG_FILE: configs/RPi3B.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false
@@ -94,7 +94,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
+        make -j$(nproc) || make -j4 || make -j2 V=s
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
@@ -161,7 +161,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
+        tag_name: ${{ steps.tag.outputs.release_tag }} $OPNAME
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
 

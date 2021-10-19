@@ -1,4 +1,4 @@
-name: NanoPi R4S
+name: NanoPi R2S
 
 on:
   repository_dispatch:
@@ -10,18 +10,19 @@ on:
         default: 'false'
 
 env:
-  OPNAME: NanoPi R4S
+  OPNAME: NanoPi R2S
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: configs/R4S.config
+  CONFIG_FILE: configs/R2S.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
   UPLOAD_WETRANSFER: false
-  UPLOAD_RELEASE: true
+  
+  : true
   TZ: Asia/Shanghai
 
 jobs:

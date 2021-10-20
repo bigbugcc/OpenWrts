@@ -1,4 +1,4 @@
-name: Raspberry Pi3B+
+name: x86_64
 
 on:
   repository_dispatch:
@@ -10,11 +10,11 @@ on:
         default: 'false'
 
 env:
-  OPNAME: 'Raspberry Pi3B+'
+  OPNAME: 'x86_64'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: configs/RPi3B.config
+  CONFIG_FILE: configs/R2S.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false
@@ -156,7 +156,7 @@ jobs:
         echo "::set-output name=status::success"
 
     - name: Upload firmware to release
-      uses: softprops/action-gh-release@main
+      uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

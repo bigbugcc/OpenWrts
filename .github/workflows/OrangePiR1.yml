@@ -1,4 +1,4 @@
-name: Raspberry Pi3B+
+name: Orange Pi R1 Plus
 
 on:
   repository_dispatch:
@@ -10,11 +10,11 @@ on:
         default: 'false'
 
 env:
-  OPNAME: 'Raspberry Pi3B+'
+  OPNAME: 'Orange Pi R1 Plus'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: configs/RPi3B.config
+  CONFIG_FILE: configs/OPi _R1P.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false

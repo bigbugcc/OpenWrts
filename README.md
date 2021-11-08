@@ -56,6 +56,7 @@
 |             树莓派 4B             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/RaspberryPi4.yml) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             NanoPi R2S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/R2S.yml) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             NanoPi R4S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/R4S.yml) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
+|             Orange Pi R1 Plus             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/OrangePiR1.yml) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 
 <br>
 

@@ -1,7 +1,7 @@
 
 
 # Action Openwrt 云自动编译
-⏰ **每星期自动拉取最新源码自动编译**
+⏰ **每天自动拉取最新源码自动编译**
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -18,7 +18,7 @@
 
   <h3 align="center">Openwrt/LEDE 云编译</h3>
   <p align="center">
-    👉 每月定时自动拉取Openwrt最新源码编译，自动发布到 [<a herf="https://github.com/bigbugcc/OpenWrts/releases"> Releases </a>]👈
+    👉 每天定时自动拉取Openwrt最新源码编译，自动发布到 [<a herf="https://github.com/bigbugcc/OpenWrts/releases"> Releases </a>]👈
     <br />
     <a href="https://github.com/bigbugcc/OpenWrts"><strong>探索本项目的文档 »</strong></a>
     <br />
@@ -57,6 +57,14 @@
 |             NanoPi R2S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/R2S.yml) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             NanoPi R4S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/R4S.yml) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             Orange Pi R1 Plus             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/OrangePiR1.yml) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
+
+<br>
+
+### 🎯固件默认设置   
+- 路由器地址: `192.168.10.1`   
+- 默认用户名: `root`   
+- 默认密码  : `password`
+ 
 
 <br>
 
@@ -150,7 +158,6 @@ filetree
 - [P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)
 - [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)
 - [luci-theme-argon](https://github.com/jerrykuku/luci-theme-argon)
-- [P3TERX/Actions-OpenWrt]()
 
 
 <!-- links -->

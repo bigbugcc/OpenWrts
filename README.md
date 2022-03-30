@@ -72,9 +72,10 @@
 ✨ 自带常用的插件   
 ✨ 集成所有openwrt的USB驱动   
 ✨ 集成Python3.x环境   
+✨ 集成Docker-CE   
 ✨ 集成Node.js(14.xLTS 带NPM)   
 ✨ 全新的 [Them](https://github.com/jerrykuku/luci-theme-argon)  
-✨ x86_64 vmdk固件集成vm-tools
+✨ x86_64 vmdk固件集成vm-tools   
 
 <br>
 
@@ -98,7 +99,8 @@
 - luci-app-n2n
 - luci-app-syncdial (多播插件)
 - luci-app-turboacc
-- luci-app-kms   
+- luci-app-kms  
+- luci-app-docker 
 ......
 
 <br>

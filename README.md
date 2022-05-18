@@ -84,6 +84,7 @@
 - PassWall / SSR Plus
 - AdGuard Home
 - Mentohust
+- luci-app-vssr   
 - luci-adbyby-plus
 - luci-app-unblockmusic
 - luci-app-ddns

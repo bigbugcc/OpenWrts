@@ -165,13 +165,18 @@ filetree
 
 <br>
 
+
+
+
 ## 项目支持
 - [P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)
 - [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)
 - [luci-theme-argon](https://github.com/jerrykuku/luci-theme-argon)
 
-<!-- links -->
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/bigbugcc/OpenWrts.svg)](https://starchart.cc/bigbugcc/OpenWrts)
 
+<!-- links -->
 [your-project-path]:https://github.com/bigbugcc/OpenWrts/
 [contributors-shield]: https://img.shields.io/github/contributors/bigbugcc/OpenWrts?style=flat-square
 [contributors-url]: https://github.com/bigbugcc/OpenWrts/graphs/contributors
@@ -183,4 +188,3 @@ filetree
 [issues-url]: https://img.shields.io/github/issues/bigbugcc/OpenWrts
 [license-shield]: https://img.shields.io/github/license/bigbugcc/OpenWrts?style=flat-square
 [license-url]: https://github.com/bigbugcc/OpenWrts/blob/master/LICENSE
-

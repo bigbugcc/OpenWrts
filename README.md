@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/bigbugcc/OpenWrts">
-    <img src="https://cdn.jsdelivr.net/gh/bigbugcc/Resource@master/github/openwrts/action1.jpg" alt="Logo" width="500" />
+    <img src="./assets/images/action1.jpg" alt="Logo" width="500" />
   </a>
   <h3 align="center">Openwrt/LEDE 云编译</h3>
   <p align="center">
@@ -28,6 +28,7 @@
     ·
     <a href="https://github.com/bigbugcc/OpenWrts/issues">提出新特性</a>
   </p>
+
 
 </p>
 
@@ -151,22 +152,25 @@ filetree
 <br>
 
 ## 固件预览
-**主界面：**
-![主界面](https://cdn.jsdelivr.net/gh/bigbugcc/Resource@latest/github/openwrts/openwrt.png)
+**主界面(主题一)：**
+![主界面](./assets/images/openwrt.png)
 
 **服务/插件：**
-![服务/插件](https://cdn.jsdelivr.net/gh/bigbugcc/Resource@latest/github/openwrts/service.png)
+![服务/插件](./assets/images/service.png)
 
 **网络：**
-![网络](https://cdn.jsdelivr.net/gh/bigbugcc/Resource@latest/github/openwrts/network.png)
+![网络](./assets/images/network.png)
+
+**经典主题二：**
+![登录页](./assets/images/infinityfreedom-theme.png)
+
+**主界面：**
+![主界面](./assets/images/infinityfreedom-theme-main.png)
+
 
 ## 版权说明
 
 该项目签署了MIT 授权许可，详情请参阅 [LICENSE](https://github.com/bigbugcc/OpenWrts/LICENSE)
-
-<br>
-
-
 
 
 ## 项目支持

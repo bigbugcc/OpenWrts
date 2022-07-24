@@ -58,7 +58,6 @@
 |             NanoPi R2S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/R2S.yml) | ![R2S](https://github.com/bigbugcc/openwrts/actions/workflows/R2S.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             NanoPi R4S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/R4S.yml) | ![R4S](https://github.com/bigbugcc/openwrts/actions/workflows/R4S.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             Orange Pi R1 Plus             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/OrangePiR1.yml) | ![OrangePiR1](https://github.com/bigbugcc/openwrts/actions/workflows/OrangePiR1.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-| Orange Pi R1 Plus LTS | [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/OrangePiR1LTS.yml) | ![OrangePiR1LTS](https://github.com/bigbugcc/openwrts/actions/workflows/OrangePiR1LTS.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 
 <br>
 

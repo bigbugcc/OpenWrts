@@ -74,6 +74,7 @@ jobs:
 
     - name: Modify configuration
       run: |
+        cd openwrt
         make defconfig
         sed -i '/CONFIG_DEFAULT_luci/'d openwrt/.config
         cat $External_FILE >> openwrt/.config

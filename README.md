@@ -1,7 +1,7 @@
 
 
 # Action Openwrt 云自动编译
-⏰ **每天自动拉取最新源码自动编译**
+⏰ **每周自动拉取最新源码自动编译**
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -15,10 +15,9 @@
   <a href="https://github.com/bigbugcc/OpenWrts">
     <img src="https://cdn.jsdelivr.net/gh/bigbugcc/Resource@master/github/openwrts/action1.jpg" alt="Logo" width="500" />
   </a>
-
   <h3 align="center">Openwrt/LEDE 云编译</h3>
   <p align="center">
-    👉 每天定时自动拉取Openwrt最新源码编译，自动发布到 [<a herf="https://github.com/bigbugcc/OpenWrts/releases"> Releases </a>]👈
+    👉 每周定时自动拉取Openwrt最新源码编译，自动发布到 [<a herf="https://github.com/bigbugcc/OpenWrts/releases"> Releases </a>]👈
     <br />
     <a href="https://github.com/bigbugcc/OpenWrts"><strong>探索本项目的文档 »</strong></a>
     <br />
@@ -69,6 +68,7 @@
 <br>
 
 ## 固件特性
+⏰ 固件编译改为`周更`(稳定为主，减少资源浪费)  
 ✨ 自带常用的插件   
 ✨ 集成所有openwrt的USB驱动   
 ✨ 集成Python3.x(带pip)环境   
@@ -76,6 +76,8 @@
 ✨ 集成Node.js(14.xLTS 带npm、yarn)   
 ✨ 全新的 [Them](https://github.com/jerrykuku/luci-theme-argon)  
 ✨ x86_64 vmdk固件集成vm-tools   
+✨ x86_64 iso格式镜像  
+✨ x86_64 Lite版本(只添加必要插件)  
 
 <br>
 

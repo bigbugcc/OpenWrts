@@ -1,4 +1,4 @@
-name: NanoPi R2S
+name: Rockchip_armv8
 
 on:
   repository_dispatch:
@@ -10,11 +10,12 @@ on:
         default: 'false'
 
 env:
-  OPNAME: 'NanoPi R2S'
+  OPNAME: 'Rockchip(R4S、R2S、ORGR1Plus)'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: configs/R2S.config
+  External_FILE: configs/External.config
+  CONFIG_FILE: configs/Rockchip.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false
@@ -71,6 +72,12 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$PACKS
 
+    - name: Modify configuration
+      run: |
+        make defconfig
+        sed -i '/CONFIG_DEFAULT_luci/'d openwrt/.config
+        cat $External_FILE >> openwrt/.config
+
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
@@ -124,7 +131,6 @@ jobs:
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
-
 
     - name: Generate release tag
       id: tag

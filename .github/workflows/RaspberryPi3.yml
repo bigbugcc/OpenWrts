@@ -14,7 +14,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  External_FILE: configs/External.config
+  EXTERNAL_FILE: configs/External.config
   CONFIG_FILE: configs/RPi3B.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
@@ -74,10 +74,10 @@ jobs:
 
     - name: Modify configuration
       run: |
-        cd openwrt
-        make defconfig
+        cat $EXTERNAL_FILE >> openwrt/.config
+        cd openwrt && make defconfig
         sed -i '/CONFIG_DEFAULT_luci/'d .config
-        cat $External_FILE >> .config
+        cat .config
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
@@ -90,7 +90,6 @@ jobs:
       id: package
       run: |
         cd openwrt
-        make defconfig
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;

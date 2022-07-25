@@ -10,7 +10,7 @@ on:
         default: 'false'
 
 env:
-  OPNAME: 'Rockchip(R4S、R2S、ORGR1Plus)'
+  OPNAME: 'Rockchip(R4S、R2S、OPiR1Plus)'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
@@ -74,7 +74,7 @@ jobs:
 
     - name: Modify configuration
       run: |
-        cat $EXTERNAL_FILE >> openwrt/.config && cat openwrt/.config
+        cat $EXTERNAL_FILE >> openwrt/.config
         cd openwrt && make defconfig
         sed -i '/CONFIG_DEFAULT_luci/'d .config
         cat .config

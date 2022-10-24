@@ -120,20 +120,25 @@ eg:
 ```
 filetree 
 ├── .github/workflows
-│  ├── R2S.yml
-│  ├── R4S.yml
+│  ├── Rockchip_armv8.yml
 │  ├── RaspberryPi3.yml
 │  ├── RaspberryPi4.yml
-│  ├── x86_64.yml
+│  ├── x86_64.yml     
+│  ├── x86_64Lite.yml
 │  ├── update-checker.yml
 ├── /configs/ (配置文件目录)
-│  ├── R2S.config
-│  ├── R4S.config
+│  ├── External.config (插件配置文件)
+│  ├── External_Lite.config (轻量版)
 │  ├── RPi3.config
 │  ├── RPi4.config
 │  ├── x86_64.config
+│  ├── x86_64Lite.config
 ├── configure.sh (固件参数修改)
 ├── package.sh (luci-app)
+
+Tips:
+x86.conf | RPi4.config - 该类型配置文件主要为机型配置文件
+External.conf / External_Lite.conf - 主要用于配置固件插件应用
 ```
 <br>
 
@@ -147,7 +152,8 @@ filetree
 ### 注意事项：
 📌 修改默认系统参数 👉 ```configure.sh```   
 📌 添加其它Luci插件 👉 ```package.sh```  
-📌 其它机型添加 👉 ```.github/workflows``` 目录下并上传 ```.config```文件到 ```/configs/```目录下
+📌 插件 / 应用配置文件 👉 ```configs/External.config```  
+📌 其它机型添加 👉 ```.github/workflows``` 目录下并上传 ```xxx.config```机型配置文件到 ```/configs/```目录下
 
 <br>
 
@@ -170,7 +176,7 @@ filetree
 
 ## 版权说明
 
-该项目签署了MIT 授权许可，详情请参阅 [LICENSE](https://github.com/bigbugcc/OpenWrts/LICENSE)
+该项目签署了MIT 授权许可，详情请参阅 [LICENSE](https://github.com/bigbugcc/OpenWrts/blob/main/LICENSE)
 
 
 ## 项目支持

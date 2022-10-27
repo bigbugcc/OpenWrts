@@ -71,7 +71,7 @@ jobs:
         chmod +x $PACKS
         cd openwrt
         $GITHUB_WORKSPACE/$PACKS
-        ::set-output
+
     - name: Modify configuration
       run: |
         cat $EXTERNAL_FILE >> openwrt/.config

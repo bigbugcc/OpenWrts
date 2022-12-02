@@ -55,7 +55,7 @@ jobs:
       uses: klever1988/cachewrtbuild@main
       with:
           ccache: 'true'
-          mixkey: '86Lite'
+          mixkey: 'x86'
           prefix: 'openwrt'
         
     - name: Load custom feeds

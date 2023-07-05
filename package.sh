@@ -15,6 +15,3 @@ git clone https://github.com/KyleRicardo/MentoHUST-OpenWrt-ipk.git package/other
 
 # UnblockNeteaseMusic
 git clone -b master  https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git package/unblockneteasemusic
-
-# SmartDNS
-git clone -b lede https://github.com/pymumu/luci-app-smartdns.git feeds/luci/applications/luci-app-smartdns/

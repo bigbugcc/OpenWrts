@@ -64,6 +64,11 @@ jobs:
         chmod +x $SYS_CONF_SH
         cd openwrt
         $GITHUB_WORKSPACE/$SYS_CONF_SH
+    
+    - name: Interceptor CommitID
+      run: |
+        cd openwrt
+        git checkout dff0d3553d314269de9a5f840abcca6232407f49
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a

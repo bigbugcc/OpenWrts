@@ -14,7 +14,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  EXTERNAL_FILE: External_Lite.config
+  EXTERNAL_FILE: configs/External_Lite.config
   CONFIG_FILE: configs/Rockchip.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh

@@ -1,6 +1,3 @@
-#!/bin/bash
-git clone  https://github.com/bigbugcc/OpenwrtApp package/otherapp/OpenwrtApp
-
 # Theme
 # luci-theme-neobird
 git clone https://github.com/thinktip/luci-theme-neobird.git package/otherapp/luci-theme-neobird

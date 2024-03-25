@@ -14,8 +14,8 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  EXTERNAL_FILE: configs/External_Lite.config
-  CONFIG_FILE: configs/x86_64Lite.config
+  EXTERNAL_FILE: configs/LuciApp_Lite.config
+  CONFIG_FILE: configs/x86_64.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false
@@ -53,7 +53,7 @@ jobs:
         haskell: true
         large-packages: true
         swap-storage: true
-    
+
     - name: Clone source code
       working-directory: /workdir
       run: |
@@ -67,7 +67,7 @@ jobs:
           ccache: 'true'
           mixkey: 'x86'
           prefix: 'openwrt'
-        
+
     - name: Load custom feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default

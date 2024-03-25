@@ -14,8 +14,8 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  EXTERNAL_FILE: configs/x86_64Gateway.config
-  CONFIG_FILE: configs/x86_64Lite.config
+  EXTERNAL_FILE: configs/LuciApp_Gateway.config
+  CONFIG_FILE: configs/x86_64.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
   UPLOAD_BIN_DIR: false

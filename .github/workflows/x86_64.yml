@@ -14,7 +14,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  EXTERNAL_FILE: configs/External.config
+  EXTERNAL_FILE: configs/LuciApp.config
   CONFIG_FILE: configs/x86_64.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
@@ -43,7 +43,7 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-        
+
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
       with:
@@ -53,7 +53,7 @@ jobs:
         haskell: true
         large-packages: true
         swap-storage: true
-        
+
     - name: Clone source code
       working-directory: /workdir
       run: |
@@ -88,7 +88,7 @@ jobs:
         chmod +x $PACKS
         cd openwrt
         $GITHUB_WORKSPACE/$PACKS
-    
+
     - name: Modify configuration
       run: |
         cat $EXTERNAL_FILE >> openwrt/.config

@@ -14,7 +14,7 @@ env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  EXTERNAL_FILE: configs/External.config
+  EXTERNAL_FILE: configs/LuciApp.config
   CONFIG_FILE: configs/RPi3B.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh

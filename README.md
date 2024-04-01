@@ -1,5 +1,3 @@
-
-
 # Action Openwrt 云自动编译
 ⏰ **每周自动拉取最新源码自动编译**
 
@@ -15,7 +13,7 @@
   <a href="https://github.com/bigbugcc/OpenWrts">
     <img src="./assets/images/action1.jpg" alt="Logo" width="500" />
   </a>
-  <h3 align="center">Openwrt/LEDE 云编译</h3>
+  <h3 align="center">Openwrt/LEDE 云编译(带应用商店)</h3>
   <p align="center">
     👉 每周定时自动拉取Openwrt最新源码编译，自动发布到 [<a herf="https://github.com/bigbugcc/OpenWrts/releases"> Releases </a>]👈
     <br />
@@ -42,7 +40,7 @@
   - [自带插件](#自带插件)
   - [文件目录说明](#文件目录说明)
   - [定制固件](#定制固件)
-    - [注意事项：](#注意事项)
+    - [注意事项](#注意事项)
   - [固件预览](#固件预览)
   - [版权说明](#版权说明)
   - [项目支持](#项目支持)
@@ -67,7 +65,6 @@
 
 ### 🎯固件默认设置
 - 路由器地址: `192.168.10.1`
-- 网关地址: `192.168.10.5`
 - 默认用户名: `root`
 - 默认密码  : `password`
 
@@ -75,6 +72,8 @@
 
 ## 固件特性
 ⏰ 固件编译改为`周更`(稳定为主，减少资源浪费)
+
+✨ iStore应用商店 [AppStore](./assets/images/appstore.png)
 
 ✨ 自带常用的插件
 
@@ -178,6 +177,9 @@ External.conf / External_Lite.conf - 主要用于配置固件插件应用
 ## 固件预览
 **主界面(主题一)：**
 ![主界面](./assets/images/openwrt.png)
+
+**应用商店/插件**
+![应用商店/插件](./assets/images/appstore.png)
 
 **服务/插件：**
 ![服务/插件](./assets/images/service.png)

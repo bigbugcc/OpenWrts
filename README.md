@@ -54,7 +54,6 @@
 | :------------------------: | :---------------------: | :-------------------: | :-------------------: | :--------------------------: |
 |             x86_64                    |  [LEDE](https://github.com/coolsnowwolf/lede) |[🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64.yml) | ![x86_64](https://github.com/bigbugcc/openwrts/actions/workflows/x86_64.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 | x86_64Lite | [LEDE](https://github.com/coolsnowwolf/lede) |[🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64Lite.yml) | ![x86_64Lite](https://github.com/bigbugcc/openwrts/actions/workflows/x86_64Lite.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             x86_64Gateway                    |  [LEDE](https://github.com/coolsnowwolf/lede) |[🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64Gateway.yml) | ![x86_64](https://github.com/bigbugcc/openwrts/actions/workflows/x86_64Gateway.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             树莓派 3B/3B+             | [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/RaspberryPi3.yml) | ![RaspberryPi3](https://github.com/bigbugcc/openwrts/actions/workflows/RaspberryPi3.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             树莓派 4B             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/RaspberryPi4.yml) | ![RaspberryPi4](https://github.com/bigbugcc/openwrts/actions/workflows/RaspberryPi4.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
 |             NanoPi R2S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip_armv8.yml) | ![R2S](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip_armv8.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
@@ -77,9 +76,9 @@
 
 ✨ 自带常用的插件
 
-✨ 集成所有openwrt的USB驱动
+✨ Arm集成所有openwrt的USB驱动
 
-✨ 集成Python3.x(带pip)环境
+✨ ~~集成Python3.x(带pip)环境~~
 
 ✨ 集成Docker-CE
 
@@ -91,9 +90,7 @@
 
 ✨ x86_64 iso格式镜像
 
-✨ x86_64 Lite版本(只添加必要插件)
-
-✨ x86_64 [Gateway版本](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64Gateway.yml)(旁路网关)
+✨ x86_64 Lite版本(必要插件&应用商店)
 
 <br>
 
@@ -140,22 +137,20 @@ filetree
 │  ├── RaspberryPi4.yml
 │  ├── x86_64.yml
 │  ├── x86_64Lite.yml
-│  ├── x86_64Gateway.yml
 │  ├── update-checker.yml
 ├── /configs/ (配置文件目录)
-│  ├── External.config (插件配置文件)
-│  ├── External_Lite.config (轻量版)
+│  ├── LuciApp.config (插件配置文件)
+│  ├── LuciApp_Lite.config (简洁配置文件)
 │  ├── RPi3.config
 │  ├── RPi4.config
 │  ├── x86_64.config
-│  ├── x86_64Lite.config
-│  ├── x86_64Gateway.config
+│  ├── Rockchip.config
 ├── configure.sh (固件参数修改)
 ├── package.sh (luci-app)
 
 Tips:
 x86.conf | RPi4.config - 该类型配置文件主要为机型配置文件
-External.conf / External_Lite.conf - 主要用于配置固件插件应用
+LuciApp.conf / LuciApp_Lite.conf - 主要用于配置固件插件应用 
 ```
 <br>
 
@@ -169,7 +164,7 @@ External.conf / External_Lite.conf - 主要用于配置固件插件应用
 ### 注意事项：
 📌 修改默认系统参数 👉 ```configure.sh```
 📌 添加其它Luci插件 👉 ```package.sh```
-📌 插件 / 应用配置文件 👉 ```configs/External.config```
+📌 插件 / 应用配置文件 👉 ```configs/LuciApp.config```
 📌 其它机型添加 👉 ```.github/workflows``` 目录下并上传 ```xxx.config```机型配置文件到 ```/configs/```目录下
 
 <br>
@@ -203,6 +198,7 @@ External.conf / External_Lite.conf - 主要用于配置固件插件应用
 - [P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)
 - [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)
 - [luci-theme-argon](https://github.com/jerrykuku/luci-theme-argon)
+- [istore](https://github.com/linkease/istore)
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/bigbugcc/OpenWrts.svg)](https://starchart.cc/bigbugcc/OpenWrts)

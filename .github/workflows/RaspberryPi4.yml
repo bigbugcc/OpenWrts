@@ -158,6 +158,11 @@ jobs:
         touch release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
+    - name: Generate release body
+      if: steps.compile.outputs.status == 'success' && !cancelled()
+      run: |
+        echo "![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ steps.tag.outputs.release_tag }}/total?style=flat-square)" >> release.txt
+
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()

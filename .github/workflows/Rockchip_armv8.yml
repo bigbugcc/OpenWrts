@@ -10,7 +10,7 @@ on:
         default: 'false'
 
 env:
-  OPNAME: 'Rockchip(R4S、R2S、OPiR1Plus)'
+  OPNAME: 'R68S、R2S、R4S、R5C、R5S、OPiR1Plus'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
@@ -161,6 +161,9 @@ jobs:
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
         echo "![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ steps.tag.outputs.release_tag }}/total?style=flat-square)" >> release.txt
+        echo "- FastRhino R68S" >> release.txt
+        echo "- FriendlyARM NanoPi R2S | R4S | R5C | R5S " >> release.txt
+        echo "- Xunlong Orange Pi R1 Plus" >> release.txt
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1

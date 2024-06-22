@@ -65,7 +65,7 @@ jobs:
       uses: klever1988/cachewrtbuild@main
       with:
           ccache: 'true'
-          mixkey: 'rpi3'
+          mixkey: 'rpi5'
           prefix: 'openwrt'
 
     - name: Load custom feeds

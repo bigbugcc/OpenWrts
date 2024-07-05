@@ -168,11 +168,9 @@ LuciApp.conf / LuciApp_Lite.conf - 主要用于配置固件插件应用
 5. 最后根据个人喜好修改 ```update-checker.yml``` 需自行添加 ```Actions secrets``` (触发自动编译)
 
 ### 注意事项：
-📌 修改默认系统参数 👉 ```configure.sh```
-📌 添加其它Luci插件 👉 ```package.sh```
-📌 插件 / 应用配置文件 👉 ```configs/LuciApp.config```
-📌 其它机型添加 👉 ```.github/workflows``` 目录下并上传 ```xxx.config```机型配置文件到 ```/configs/```目录下
-
+📌 修改默认系统参数 👉 ```configure.sh```   
+📌 添加其它Luci插件 👉 ```package.sh```   
+📌 插件 / 应用配置文件 👉 ```configs/LuciApp.config```   
 <br>
 
 ## 固件预览

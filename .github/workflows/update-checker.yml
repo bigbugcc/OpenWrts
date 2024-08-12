@@ -15,31 +15,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-    - name: Get Commit Hash
-      id: getHash
-      run: |
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
-        echo "commitHash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-
-    - name: Compare Commit Hash
-      id: cacheHash
-      uses: actions/cache@v3
-      with:
-        path: .commitHash
-        key: HEAD-${{ steps.getHash.outputs.commitHash }}
-
-    - name: Save New Commit Hash
-      if: steps.cacheHash.outputs.cache-hit != 'true'
-      run: |
-        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
-
-    - name: Trigger build
-      if: steps.cacheHash.outputs.cache-hit != 'true'
-      uses: peter-evans/repository-dispatch@v2
-      with:
-        token: ${{ secrets.OP_ACTIONS_TRIGGER_PAT }}
-        event-type: Source Code Update
+    - name: AutoTrigger-ActionBot
+      uses: bigbugcc/ActionBot@main
 
     - name: Delete workflow runs
       uses: bigbugcc/delete-workflow-runs@main

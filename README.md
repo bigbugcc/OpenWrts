@@ -100,7 +100,7 @@
 
 ## 自带插件
 🍕 默认插件
-- PassWall2 / SSR Plus
+- PassWall2 / SSR Plus / OpenClash
 - AdGuard Home
 - Mentohust
 - ~~luci-app-vssr~~

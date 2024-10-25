@@ -1,10 +1,10 @@
-name: 问题描述
+name: 问题描述[Bug]
 description: 反馈问题模板
 body:
   - type: textarea
     id: description
     attributes:
-      label: 详细叙述
+      label: 问题描述
       description: 详细叙述问题
     validations:
       required: true
@@ -16,11 +16,38 @@ body:
       options:
         - label: 没有类似的 issue
           required: true
-  - type: input
-    id: model_name
+  - type: checkboxes
+    id: search_browser
     attributes:
-      label: 具体型号
-      description: 硬件型号
+      label: 浏览器搜索
+      description: 是否在浏览器搜索了相关的问题
+      options:
+        - label: 未找到类似的问题
+          required: true     
+  - type: dropdown
+    id: Model
+    attributes:
+      label: "设备型号"
+      description: "使用的设备型号"
+      multiple: true
+      options:
+        - RaspberryPi3
+        - RaspberryPi4
+        - RaspberryPi5
+        - x86_64
+        - R68S
+        - NanoPi R2S
+        - NanoPi R4S
+        - NanoPi R5C
+        - NanoPi R5S
+        - OrangePi R1 Plus
+    validations:
+      required: true
+  - type: input
+    id: firmware_name
+    attributes:
+      label: 固件版本
+      description: 使用的固件名称(例如：openwrt-x86-64-generic-ext4-combined-efi.img.gz)
     validations:
       required: true
   - type: textarea

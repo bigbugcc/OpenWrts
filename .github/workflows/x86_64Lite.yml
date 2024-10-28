@@ -3,21 +3,17 @@ name: x86_64Lite
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
 
 env:
   OPNAME: 'x86_64Lite'
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
-  EXTERNAL_FILE: configs/LuciApp_Lite.config
+  EXTERNAL_FILE: configs/luci/Lite.config
   CONFIG_FILE: configs/x86_64.config
   SYS_CONF_SH: configure.sh
   PACKS: package.sh
+  EXTEND_DRIVER: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -89,19 +85,17 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$PACKS
 
+    - name: Extend Driver
+      if: env.EXTEND_DRIVER == 'true'
+      run: |
+        cat configs/Driver.config >> openwrt/.config
+
     - name: Modify configuration
       run: |
         cat $EXTERNAL_FILE >> openwrt/.config
         cd openwrt && make defconfig
         sed -i '/CONFIG_DEFAULT_luci/'d .config
         cat .config
-
-    - name: SSH connection to Actions
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
     - name: Download package
       id: package

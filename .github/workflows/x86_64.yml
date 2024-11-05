@@ -48,7 +48,7 @@ jobs:
         ln -sf /mnt/workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Cache
-      uses: klever1988/cachewrtbuild@main
+      uses: stupidloud/cachewrtbuild@main
       with:
           ccache: 'true'
           mixkey: 'x86'

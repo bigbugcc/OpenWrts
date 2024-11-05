@@ -1,4 +1,4 @@
-name: Update Checker
+name: ActionTrigger
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -18,7 +18,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       
-    - name: AutoTrigger-ActionBot
+    - name: AutoTrigger
       uses: bigbugcc/ActionBot@main
 
     - name: Delete workflow runs

@@ -145,9 +145,7 @@ jobs:
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
         echo "![](https://img.shields.io/github/downloads/${{ github.repository }}/${{ steps.tag.outputs.release_tag }}/total?style=flat-square)" >> release.txt
-        echo "- FastRhino R68S" >> release.txt
-        echo "- FriendlyARM R4S" >> release.txt
-        echo "- Xunlong Orange Pi R1 Plus" >> release.txt
+        echo "- 自用FriendlyARM NanoPi R4S 固件 " >> release.txt
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1

@@ -151,7 +151,7 @@ jobs:
         echo "- 内核版本: ${{ env.KERNEL }} " >> release.txt
 
     - name: Upload firmware to release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

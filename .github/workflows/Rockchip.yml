@@ -89,43 +89,6 @@ jobs:
         sed -i '/CONFIG_DEFAULT_luci/'d .config
         cat .config
 
-    - name: Docker setup (Add custom disk and Docker root)
-      run: |
-        # 设置磁盘镜像文件的位置
-        DISK_IMAGE="/opt/docker/docker.img"
-        MOUNT_POINT="/opt/docker"
-        DOCKER_CONFIG="/etc/docker/daemon.json"
-
-        # 创建一个 4GB 的磁盘镜像
-        echo "Creating 4GB disk image..."
-        dd if=/dev/zero of=$DISK_IMAGE bs=1M count=4096
-
-        # 格式化磁盘镜像为 ext4 文件系统
-        echo "Formatting the disk image..."
-        mkfs.ext4 $DISK_IMAGE
-
-        # 创建挂载点目录
-        echo "Creating mount point directory..."
-        mkdir -p $MOUNT_POINT
-
-        # 挂载磁盘镜像
-        echo "Mounting disk image..."
-        mount -o loop $DISK_IMAGE $MOUNT_POINT
-
-        # 配置 Docker 使用新的根目录
-        echo "Configuring Docker to use the new data-root..."
-        if [ ! -f "$DOCKER_CONFIG" ]; then
-            echo "{}" > $DOCKER_CONFIG  # 如果没有 daemon.json 文件，创建一个空的 JSON 文件
-        fi
-        jq '. + {"data-root": "/opt/docker"}' $DOCKER_CONFIG > $DOCKER_CONFIG.tmp && mv $DOCKER_CONFIG.tmp $DOCKER_CONFIG
-
-        # 重启 Docker 服务以应用更改
-        echo "Restarting Docker service..."
-        /etc/init.d/dockerd restart
-
-        # 提示操作完成
-        echo "Docker root directory has been changed to 4GB disk image at /opt/docker."
-
     - name: Download package
       id: package
       run: |

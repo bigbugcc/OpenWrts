@@ -12,6 +12,7 @@ env:
   EXTERNAL_FILE: configs/luci/Standard.config
   CONFIG_FILE: configs/Rockchip.config
   SYS_CONF_SH: configure.sh
+  ARCH_KERNEL: arm64
   PACKS: package.sh
   EXTEND_DRIVER: true
   UPLOAD_BIN_DIR: false

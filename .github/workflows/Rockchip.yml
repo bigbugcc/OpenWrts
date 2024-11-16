@@ -15,7 +15,7 @@ env:
   PACKS: package.sh
   EXTEND_DRIVER: true
   UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 

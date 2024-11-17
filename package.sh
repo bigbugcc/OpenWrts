@@ -29,7 +29,7 @@ git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci
 git clone https://github.com/dxs12566/nas-packages.git package/luci-app-unishare
 
 # 添加 pushbot
-git clone --depth 1 https://github.com/zzsj0928/luci-app-pushbot package/otherapp/luci-app-pushbot
+git clone --depth 1 https://github.com/zzsj0928/luci-app-pushbot package/luci-app-pushbot
 
 # Themes
 rm -rf luci-theme-argon

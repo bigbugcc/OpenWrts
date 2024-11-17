@@ -34,3 +34,4 @@ git clone --depth 1 https://github.com/zzsj0928/luci-app-pushbot package/otherap
 # Themes
 rm -rf luci-theme-argon
 git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
+git clone https://github.com/gngpp/luci-theme-design.git luci-theme-design

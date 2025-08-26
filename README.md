@@ -49,7 +49,6 @@
 
 
 ## 支持的设备
-🎯 带应用商店的固件：`x86Lite`
 |           支持的设备        |         固类别         |        Action         |            状态          |              下载页          |
 | :------------------------: | :---------------------: | :-------------------: | :-------------------: | :--------------------------: |
 |             x86_64                    |  [LEDE](https://github.com/coolsnowwolf/lede) |[🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64.yml) | ![x86_64](https://github.com/bigbugcc/openwrts/actions/workflows/x86_64.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |

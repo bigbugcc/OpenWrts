@@ -47,6 +47,23 @@
 
 <br>
 
+## 📢 新功能：动态源选择
+
+🎉 现在所有工作流都支持通过 `REPO` 环境变量动态选择 OpenWrt 源代码仓库！
+
+支持的源：
+- **lede** - [Lean's LEDE](https://github.com/coolsnowwolf/lede) (默认)
+- **immortalwrt** - [ImmortalWrt](https://github.com/immortalwrt/immortalwrt)
+
+**使用方法**：编辑工作流文件 (`.github/workflows/*.yml`) 中的 `REPO` 字段：
+```yaml
+env:
+  REPO: lede  # 修改为 'lede' 或 'immortalwrt'
+```
+
+详细说明请查看：[源代码仓库选择指南](./docs/REPO_SELECTION.md)
+
+<br>
 
 ## 支持的设备
 |           支持的设备        |         固类别         |        Action         |            状态          |              下载页          |
@@ -151,23 +168,28 @@ filetree
 │  ├── RPi5.config
 │  ├── x86_64.config
 │  ├── Rockchip.config
+├── yum.sh (源代码克隆脚本 - 根据REPO变量克隆lede或immortalwrt源)
 ├── configure.sh (固件参数修改)
 ├── package.sh (luci-app)
 
 Tips:
+yum.sh - 源代码克隆脚本，根据环境变量REPO选择克隆lede或immortalwrt源
 x86.conf | RPi4.config - 该类型配置文件主要为机型配置文件
-Standard.conf / Lite.conf - 主要用于配置固件插件应用 
+Standard.conf / Lite.config - 主要用于配置固件插件应用 
+configure.sh - 用于修改默认系统设置（如IP地址）和添加feeds源
+package.sh - 用于克隆和安装额外的luci应用插件
 ```
 <br>
 
 ## 定制固件
 1. Fork 此项目
-2. 按需修改 ```configure.sh``` 和 ```package.sh``` 文件
+2. 按需修改 ```yum.sh```（源选择）、```configure.sh```（系统设置） 和 ```package.sh```（插件） 文件
 3. 上传你自己的 ```xx.config``` 配置文件到configs目录
 4. 添加或修改自己的``````xx.yml``````文件
 5. 最后根据个人喜好修改 ```update-checker.yml``` 需自行添加 ```Actions secrets``` (触发自动编译)
 
 ### 注意事项：
+📌 选择源代码仓库 👉 ```yum.sh``` 中的 REPO 变量 或工作流中的 REPO 环境变量   
 📌 修改默认系统参数 👉 ```configure.sh```   
 📌 添加其它Luci插件 👉 ```package.sh```   
 📌 插件 / 应用配置文件 👉 ```configs/Standard.config```   

@@ -6,7 +6,7 @@ on:
 
 env:
   OPNAME: 'R68S、R2S、R4S、R5C、R5S、OPiR1Plus'
-  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO: lede
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   EXTERNAL_FILE: configs/luci/Standard.config
@@ -33,7 +33,8 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* 
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/bigbugcc/openwrts/master/openwrt-env)
+        chmod +x $GITHUB_WORKSPACE/environment.sh
+        $GITHUB_WORKSPACE/environment.sh
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -44,7 +45,8 @@ jobs:
       working-directory: /mnt/workdir
       run: |
         df -hT $PWD
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        chmod +x $GITHUB_WORKSPACE/source.sh
+        $GITHUB_WORKSPACE/source.sh openwrt
         ln -sf /mnt/workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Cache

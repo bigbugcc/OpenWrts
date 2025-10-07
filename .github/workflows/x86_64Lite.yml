@@ -6,7 +6,7 @@ on:
 
 env:
   OPNAME: 'x86_64Lite'
-  REPO: lede
+  REPO: immortalwrt
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   EXTERNAL_FILE: configs/luci/Lite.config

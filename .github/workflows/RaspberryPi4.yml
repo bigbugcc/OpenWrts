@@ -53,7 +53,7 @@ jobs:
       uses: stupidloud/cachewrtbuild@main
       with:
           ccache: 'true'
-          mixkey: 'rpi4'
+          mixkey: 'rpi4-$REPO'
           prefix: 'openwrt'
 
     - name: Load custom feeds

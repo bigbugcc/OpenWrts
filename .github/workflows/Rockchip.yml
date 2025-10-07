@@ -53,7 +53,7 @@ jobs:
       uses: stupidloud/cachewrtbuild@main
       with:
           ccache: 'true'
-          mixkey: 'armv8'
+          mixkey: 'armv8-$REPO'
           prefix: 'openwrt'
 
     - name: Load custom feeds

@@ -24,7 +24,6 @@ env:
   OPNAME: 'x86_64'
   REPO: lede  # 将此值改为 'lede' 或 'immortalwrt'
   REPO_BRANCH: master
-  CLONE_SH: yum.sh  # 克隆脚本
 ```
 
 #### 使用 Lean's LEDE 源
@@ -64,15 +63,22 @@ env:
 
 ## 实现原理
 
-克隆步骤通过 `yum.sh` 脚本执行，脚本会根据 `REPO` 环境变量的值动态选择源仓库：
+所有脚本根据 `REPO` 环境变量自动适配对应上游源：
+
+| 脚本 | REPO 感知行为 |
+|------|---------------|
+| `environment.sh` | 按 lede/immortalwrt 安装不同的编译依赖 |
+| `source.sh` | 按 REPO 值克隆对应上游仓库 |
+| `configure.sh` | 按 REPO 值注入适配的第三方 feeds |
+| `package.sh` | 按 REPO 值选择性克隆第三方包（lede 含 small-package，immortalwrt 跳过以避免冲突） |
 
 **工作流中的使用：**
 ```yaml
 - name: Clone source code
   working-directory: /mnt/workdir
   run: |
-    chmod +x $GITHUB_WORKSPACE/$CLONE_SH
-    $GITHUB_WORKSPACE/$CLONE_SH openwrt
+    chmod +x $GITHUB_WORKSPACE/source.sh
+    $GITHUB_WORKSPACE/source.sh openwrt
     ln -sf /mnt/workdir/openwrt $GITHUB_WORKSPACE/openwrt
 ```
 
@@ -94,7 +100,6 @@ env:
   OPNAME: 'x86_64'
   REPO: immortalwrt  # 修改为 immortalwrt
   REPO_BRANCH: master  # 或其他分支如 'openwrt-23.05'
-  CLONE_SH: yum.sh
   FEEDS_CONF: feeds.conf.default
   EXTERNAL_FILE: configs/luci/Standard.config
   CONFIG_FILE: configs/x86_64.config
@@ -108,34 +113,39 @@ env:
   OPNAME: 'Raspberry Pi4'
   REPO: immortalwrt
   REPO_BRANCH: openwrt-23.05  # 使用特定分支
-  CLONE_SH: yum.sh
   # ... 其他配置
 ```
 
 ## 本地使用
 
-您也可以在本地直接使用 `yum.sh` 脚本克隆源代码：
+您也可以在本地直接使用 `source.sh` 脚本克隆源代码：
 
 ```bash
 # 使用 lede 源（默认）
 export REPO=lede
 export REPO_BRANCH=master
-./yum.sh
+./source.sh openwrt
 
 # 使用 immortalwrt 源
 export REPO=immortalwrt
 export REPO_BRANCH=master
-./yum.sh
+./source.sh openwrt
 
 # 指定克隆目录
-./yum.sh my-openwrt-dir
+./source.sh my-openwrt-dir
 ```
 
 ## 扩展其他源
 
-如需添加其他 OpenWrt 源，请修改 `yum.sh` 脚本，添加新的 elif 条件：
+如需添加其他 OpenWrt 源，请修改以下脚本中的 `case`/`if` 分支：
+
+- `source.sh` — 添加新仓库 URL
+- `environment.sh` — 添加对应的编译依赖
+- `configure.sh` — 添加对应的 feeds 配置
+- `package.sh` — 添加对应的第三方包策略
 
 ```bash
+# source.sh 中添加:
 elif [ "$REPO" = "新源名称" ]; then
     REPO_URL="https://github.com/用户名/仓库名"
     echo "✓ Using 新源名称 source"
@@ -143,9 +153,10 @@ elif [ "$REPO" = "新源名称" ]; then
 
 ## 文件说明
 
-- **yum.sh** - 源代码克隆脚本，根据 `REPO` 环境变量选择并克隆相应的源代码仓库
-- **configure.sh** - 系统配置脚本，用于修改默认设置和添加 feeds
-- **package.sh** - 插件安装脚本，用于克隆和安装额外的应用插件
+- **environment.sh** - 编译环境脚本，根据 `REPO` 安装对应上游所需的编译依赖
+- **source.sh** - 源代码克隆脚本，根据 `REPO` 选择并克隆相应的源代码仓库
+- **configure.sh** - 系统配置脚本，根据 `REPO` 修改默认设置和注入适配的第三方 feeds
+- **package.sh** - 插件安装脚本，根据 `REPO` 选择性克隆和安装额外的应用插件
 
 ## 问题排查
 

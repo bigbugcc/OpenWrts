@@ -8,7 +8,7 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。默认 REA
   <img src="./assets/images/action1.jpg" alt="OpenWrts" width="500" />
 </p>
 
-![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg)
+![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg)
 ![Manual Build](https://github.com/bigbugcc/OpenWrts/actions/workflows/manual-build.yml/badge.svg)
 ![Release Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square)
 ![Latest Release](https://img.shields.io/github/v/release/bigbugcc/OpenWrts?style=flat-square)
@@ -16,16 +16,16 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。默认 REA
 
 ## 固件构建列表
 
-固件构建列表统一维护在 [`manifests/builds.json`](./manifests/builds.json)。定时 workflow 每周运行一次，`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换。
+固件构建列表统一维护在 [`manifests/builds.json`](./manifests/builds.json)。定时 workflow 负责计划发布，`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换。
 
 | 源码 | 设备 ID | 平台 | 风格 | Workflow 状态 | 下载统计 |
 | --- | --- | --- | --- | --- | --- |
-| `lede` | `x86_64` | x86_64 generic | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rpi3` | Raspberry Pi 3B/3B+ | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rpi4` | Raspberry Pi 4B | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rockchip` | R68S、NanoPi R2S/R4S/R5C/R5S、Orange Pi R1 Plus | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `immortalwrt` | `x86_64-lite` | x86_64 generic | `lite` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `x86_64` | x86_64 generic | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi3` | Raspberry Pi 3B/3B+ | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi4` | Raspberry Pi 4B | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rockchip` | R68S、NanoPi R2S/R4S/R5C/R5S、Orange Pi R1 Plus | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `x86_64-lite` | x86_64 generic | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 
 ## LuCI 插件列表
 
@@ -63,10 +63,9 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。默认 REA
 
 | Workflow | 用途 |
 | --- | --- |
-| [`weekly-release.yml`](./.github/workflows/weekly-release.yml) | 每周定时发布。`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换 |
+| [`schedule-release.yml`](./.github/workflows/schedule-release.yml) | 定时发布。`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换 |
 | [`manual-build.yml`](./.github/workflows/manual-build.yml) | 手动构建入口，可选择源码、设备、风格、分支和是否发布 |
 | [`build-openwrt.yml`](./.github/workflows/build-openwrt.yml) | reusable workflow，负责构建单个 matrix 项 |
-| [`ActionTrigger.yml`](./.github/workflows/ActionTrigger.yml) | 手动维护 workflow，用于清理旧 workflow runs 和旧 releases |
 
 定时 workflow 使用 UTC 时间：
 
@@ -80,7 +79,7 @@ schedule:
 ## 构建流程
 
 ```text
-weekly/manual workflow
+scheduled/manual workflow
   -> scripts/resolve-matrix.py 生成构建矩阵
   -> build-openwrt.yml
      -> scripts/prepare-env.sh
@@ -98,9 +97,8 @@ weekly/manual workflow
 ```text
 .github/workflows/
   build-openwrt.yml      reusable 构建 workflow
-  weekly-release.yml     定时源码轮换发布 workflow
+  schedule-release.yml   定时源码轮换发布 workflow
   manual-build.yml       手动构建 workflow
-  ActionTrigger.yml      手动维护 workflow
 
 manifests/
   builds.json            构建矩阵定义
@@ -151,7 +149,7 @@ repo + branch + cache_scope + hash(feeds/packages/scripts/configs/manifests)
 
 进入 GitHub Actions，运行 `Manual OpenWrt Build`，然后选择：
 
-- `repo`: `auto`、`lede` 或 `immortalwrt`。选择 `auto` 时会根据设备自动匹配源码；当 `device=all` 时，`auto` 使用每周轮换规则。
+- `repo`: `auto`、`lede` 或 `immortalwrt`。选择 `auto` 时会根据设备自动匹配源码；当 `device=all` 时，`auto` 使用定时轮换规则。
 - `device`: `all` 或构建矩阵里的设备 ID
 - `flavor`: `all`、`standard` 或 `lite`
 - `branch`: 留空使用 manifest 默认分支，也可以填写上游分支

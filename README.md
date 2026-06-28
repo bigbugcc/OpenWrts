@@ -8,7 +8,7 @@ OpenWrts builds OpenWrt firmware with GitHub Actions. The default documentation 
   <img src="./assets/images/action1.jpg" alt="OpenWrts" width="500" />
 </p>
 
-![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg)
+![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg)
 ![Manual Build](https://github.com/bigbugcc/OpenWrts/actions/workflows/manual-build.yml/badge.svg)
 ![Release Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square)
 ![Latest Release](https://img.shields.io/github/v/release/bigbugcc/OpenWrts?style=flat-square)
@@ -16,16 +16,16 @@ OpenWrts builds OpenWrt firmware with GitHub Actions. The default documentation 
 
 ## Firmware Builds
 
-The firmware build list is maintained in [`manifests/builds.json`](./manifests/builds.json). The scheduled workflow runs weekly and alternates between LEDE and ImmortalWrt in `auto` mode.
+The firmware build list is maintained in [`manifests/builds.json`](./manifests/builds.json). The scheduled workflow controls timed releases and alternates between LEDE and ImmortalWrt in `auto` mode.
 
 | Source | Device ID | Platform | Flavor | Workflow status | Downloads |
 | --- | --- | --- | --- | --- | --- |
-| `lede` | `x86_64` | x86_64 generic | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rpi3` | Raspberry Pi 3B/3B+ | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rpi4` | Raspberry Pi 4B | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `lede` | `rockchip` | R68S, NanoPi R2S/R4S/R5C/R5S, Orange Pi R1 Plus | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
-| `immortalwrt` | `x86_64-lite` | x86_64 generic | `lite` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `x86_64` | x86_64 generic | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi3` | Raspberry Pi 3B/3B+ | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi4` | Raspberry Pi 4B | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rockchip` | R68S, NanoPi R2S/R4S/R5C/R5S, Orange Pi R1 Plus | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `x86_64-lite` | x86_64 generic | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 
 ## LuCI Plugins
 
@@ -63,10 +63,9 @@ The two sources do not share the same SDK, feeds, LuCI version, package set, or 
 
 | Workflow | Purpose |
 | --- | --- |
-| [`weekly-release.yml`](./.github/workflows/weekly-release.yml) | Scheduled weekly release. `auto` mode alternates between LEDE and ImmortalWrt by ISO week parity |
+| [`schedule-release.yml`](./.github/workflows/schedule-release.yml) | Scheduled release. `auto` mode alternates between LEDE and ImmortalWrt by ISO week parity |
 | [`manual-build.yml`](./.github/workflows/manual-build.yml) | Manual build entry point with source, device, flavor, branch, and release controls |
 | [`build-openwrt.yml`](./.github/workflows/build-openwrt.yml) | Reusable workflow that builds one matrix item |
-| [`ActionTrigger.yml`](./.github/workflows/ActionTrigger.yml) | Manual maintenance workflow for cleaning old workflow runs and releases |
 
 The scheduled workflow uses UTC:
 
@@ -80,7 +79,7 @@ This is roughly Sunday 00:23 in Asia/Shanghai.
 ## Build Flow
 
 ```text
-weekly/manual workflow
+scheduled/manual workflow
   -> scripts/resolve-matrix.py generates the build matrix
   -> build-openwrt.yml
      -> scripts/prepare-env.sh
@@ -98,9 +97,8 @@ weekly/manual workflow
 ```text
 .github/workflows/
   build-openwrt.yml      reusable build workflow
-  weekly-release.yml     scheduled source-rotation release workflow
+  schedule-release.yml   scheduled source-rotation release workflow
   manual-build.yml       manual build workflow
-  ActionTrigger.yml      manual maintenance workflow
 
 manifests/
   builds.json            build matrix definition
@@ -151,7 +149,7 @@ This avoids reusing incompatible cache data across LEDE, ImmortalWrt, devices, a
 
 Open GitHub Actions and run `Manual OpenWrt Build`, then choose:
 
-- `repo`: `auto`, `lede`, or `immortalwrt`. Use `auto` to resolve the source from the selected device; for `device=all`, `auto` follows the weekly rotation.
+- `repo`: `auto`, `lede`, or `immortalwrt`. Use `auto` to resolve the source from the selected device; for `device=all`, `auto` follows the scheduled rotation rule.
 - `device`: `all` or a device ID from the matrix
 - `flavor`: `all`, `standard`, or `lite`
 - `branch`: leave empty to use the manifest default, or provide an upstream branch

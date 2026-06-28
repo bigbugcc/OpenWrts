@@ -1,10 +1,10 @@
-name: Weekly OpenWrt Release
+name: Scheduled OpenWrt Release
 
 on:
   workflow_dispatch:
     inputs:
       repo:
-        description: Source repo to build. Use auto for weekly LEDE/ImmortalWrt rotation.
+        description: Source repo to build. Use auto for scheduled LEDE/ImmortalWrt rotation.
         required: true
         type: choice
         options:
@@ -34,7 +34,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Resolve weekly build matrix
+      - name: Resolve scheduled build matrix
         id: matrix
         env:
           REQUESTED_REPO: ${{ github.event.inputs.repo || 'auto' }}

@@ -151,7 +151,7 @@ repo + branch + cache_scope + hash(feeds/packages/scripts/configs/manifests)
 
 进入 GitHub Actions，运行 `Manual OpenWrt Build`，然后选择：
 
-- `repo`: `lede` 或 `immortalwrt`
+- `repo`: `auto`、`lede` 或 `immortalwrt`。选择 `auto` 时会根据设备自动匹配源码；当 `device=all` 时，`auto` 使用每周轮换规则。
 - `device`: `all` 或构建矩阵里的设备 ID
 - `flavor`: `all`、`standard` 或 `lite`
 - `branch`: 留空使用 manifest 默认分支，也可以填写上游分支

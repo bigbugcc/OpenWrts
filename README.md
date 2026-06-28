@@ -151,7 +151,7 @@ This avoids reusing incompatible cache data across LEDE, ImmortalWrt, devices, a
 
 Open GitHub Actions and run `Manual OpenWrt Build`, then choose:
 
-- `repo`: `lede` or `immortalwrt`
+- `repo`: `auto`, `lede`, or `immortalwrt`. Use `auto` to resolve the source from the selected device; for `device=all`, `auto` follows the weekly rotation.
 - `device`: `all` or a device ID from the matrix
 - `flavor`: `all`, `standard`, or `lite`
 - `branch`: leave empty to use the manifest default, or provide an upstream branch

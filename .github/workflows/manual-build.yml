@@ -4,12 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       repo:
-        description: Source repo to build.
+        description: Source repo to build. Use auto to resolve by device.
         required: true
         type: choice
         options:
+          - auto
           - lede
           - immortalwrt
+        default: auto
       device:
         description: Device id from manifests/builds.json, or all.
         required: true

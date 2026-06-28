@@ -6,12 +6,38 @@ import os
 from pathlib import Path
 
 
-def resolve_repo(requested: str) -> str:
-    if requested != "auto":
-        return requested
-
-    week = dt.datetime.now(dt.UTC).isocalendar().week
+def scheduled_repo() -> str:
+    week = dt.datetime.now(dt.timezone.utc).isocalendar().week
     return "lede" if week % 2 == 0 else "immortalwrt"
+
+
+def matching_items(data: dict, repo_names: list[str], device: str, flavor: str) -> list[dict]:
+    include = []
+
+    for repo in repo_names:
+        repo_data = data["builds"][repo]
+        for item in repo_data.get("devices", []):
+            if device != "all" and item["id"] != device:
+                continue
+            if flavor != "all" and item.get("flavor", "") != flavor:
+                continue
+
+            matrix_item = dict(item)
+            matrix_item["repo"] = repo
+            include.append(matrix_item)
+
+    return include
+
+
+def available_matches(data: dict, device: str, flavor: str) -> str:
+    matches = matching_items(data, list(data["builds"].keys()), device, flavor)
+    if not matches:
+        return "none"
+
+    return ", ".join(
+        f"{item['repo']}/{item['id']}[{item.get('flavor', 'unknown')}]"
+        for item in matches
+    )
 
 
 def main() -> int:
@@ -23,35 +49,36 @@ def main() -> int:
     parser.add_argument("--branch", default="")
     args = parser.parse_args()
 
-    repo = resolve_repo(args.repo)
     manifest_path = Path(args.manifest)
     data = json.loads(manifest_path.read_text(encoding="utf-8"))
 
-    if repo not in data["builds"]:
-        raise SystemExit(f"Unknown repo '{repo}'.")
+    if args.repo != "auto" and args.repo not in data["builds"]:
+        raise SystemExit(f"Unknown repo '{args.repo}'.")
 
-    repo_data = data["builds"][repo]
-    branch = args.branch or repo_data.get("branch", "master")
-    include = []
+    if args.repo == "auto" and args.device != "all":
+        repo_names = list(data["builds"].keys())
+        repo = "auto"
+    else:
+        repo = scheduled_repo() if args.repo == "auto" else args.repo
+        repo_names = [repo]
 
-    for item in repo_data.get("devices", []):
-        if args.device != "all" and item["id"] != args.device:
-            continue
-        if args.flavor != "all" and item.get("flavor", "") != args.flavor:
-            continue
+    include = matching_items(data, repo_names, args.device, args.flavor)
 
-        matrix_item = dict(item)
-        matrix_item["repo"] = repo
-        matrix_item["branch"] = branch
-        include.append(matrix_item)
+    for item in include:
+        repo_data = data["builds"][item["repo"]]
+        item["branch"] = args.branch or repo_data.get("branch", "master")
 
     if not include:
+        alternatives = available_matches(data, args.device, args.flavor)
         raise SystemExit(
-            f"No builds matched repo={repo}, device={args.device}, flavor={args.flavor}."
+            "No builds matched "
+            f"repo={args.repo}, device={args.device}, flavor={args.flavor}. "
+            f"Available matching builds: {alternatives}."
         )
 
+    output_repo = include[0]["repo"] if len({item["repo"] for item in include}) == 1 else "multiple"
     output = {
-        "repo": repo,
+        "repo": output_repo,
         "matrix": json.dumps({"include": include}, separators=(",", ":")),
     }
 

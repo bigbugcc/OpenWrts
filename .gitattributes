@@ -4,4 +4,5 @@
 *.yaml text eol=lf
 *.json text eol=lf
 *.config text eol=lf
+*.conf text eol=lf
 *.md text eol=lf

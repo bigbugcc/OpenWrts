@@ -1,0 +1,68 @@
+{
+  "builds": {
+    "lede": {
+      "branch": "master",
+      "devices": [
+        {
+          "id": "x86_64",
+          "op_name": "x86_64",
+          "flavor": "standard",
+          "target_config": "configs/targets/lede/x86_64.config",
+          "app_config": "configs/apps/lede/standard.config",
+          "driver_config": "configs/drivers/lede/common.config",
+          "cache_scope": "lede-x86_64-standard"
+        },
+        {
+          "id": "rpi3",
+          "op_name": "Raspberry Pi3B+",
+          "flavor": "standard",
+          "target_config": "configs/targets/lede/rpi3.config",
+          "app_config": "configs/apps/lede/standard.config",
+          "driver_config": "configs/drivers/lede/common.config",
+          "cache_scope": "lede-rpi3-standard"
+        },
+        {
+          "id": "rpi4",
+          "op_name": "Raspberry Pi4",
+          "flavor": "standard",
+          "target_config": "configs/targets/lede/rpi4.config",
+          "app_config": "configs/apps/lede/standard.config",
+          "driver_config": "configs/drivers/lede/common.config",
+          "cache_scope": "lede-rpi4-standard"
+        },
+        {
+          "id": "rpi5",
+          "op_name": "Raspberry Pi5",
+          "flavor": "standard",
+          "target_config": "configs/targets/lede/rpi5.config",
+          "app_config": "configs/apps/lede/standard.config",
+          "driver_config": "configs/drivers/lede/common.config",
+          "cache_scope": "lede-rpi5-standard"
+        },
+        {
+          "id": "rockchip",
+          "op_name": "R68S-R2S-R4S-R5C-R5S-OPiR1Plus",
+          "flavor": "standard",
+          "target_config": "configs/targets/lede/rockchip.config",
+          "app_config": "configs/apps/lede/standard.config",
+          "driver_config": "configs/drivers/lede/common.config",
+          "cache_scope": "lede-rockchip-standard"
+        }
+      ]
+    },
+    "immortalwrt": {
+      "branch": "master",
+      "devices": [
+        {
+          "id": "x86_64-lite",
+          "op_name": "x86_64Lite",
+          "flavor": "lite",
+          "target_config": "configs/targets/immortalwrt/x86_64.config",
+          "app_config": "configs/apps/immortalwrt/lite.config",
+          "driver_config": "configs/drivers/immortalwrt/common.config",
+          "cache_scope": "immortalwrt-x86_64-lite"
+        }
+      ]
+    }
+  }
+}

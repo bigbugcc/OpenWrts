@@ -1,243 +1,198 @@
-# Action Openwrt 云自动编译
-⏰ **每周自动拉取最新源码自动编译**
+# OpenWrts
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[English](./README.md) | [简体中文](./README.zh-CN.md)
 
-<br />
+OpenWrts builds OpenWrt firmware with GitHub Actions. The default documentation language is English; a Chinese version is available above.
 
 <p align="center">
-  <a href="https://github.com/bigbugcc/OpenWrts">
-    <img src="./assets/images/action1.jpg" alt="Logo" width="500" />
-  </a>
-  <h3 align="center">Openwrt/LEDE 云编译(带应用商店)</h3>
-  <p align="center">
-    👉 每周定时自动拉取Openwrt最新源码编译，自动发布到 [<a herf="https://github.com/bigbugcc/OpenWrts/releases"> Releases </a>]👈
-    <br />
-    <a href="https://github.com/bigbugcc/OpenWrts"><strong>探索本项目的文档 »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/bigbugcc/OpenWrts/releases">下载地址</a>
-    ·
-    <a href="https://github.com/bigbugcc/OpenWrts/actions">Action</a>
-    ·
-    <a href="https://github.com/bigbugcc/OpenWrts/issues">提出新特性</a>
-  </p>
-
+  <img src="./assets/images/action1.jpg" alt="OpenWrts" width="500" />
 </p>
 
-## 目录
+![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg)
+![Manual Build](https://github.com/bigbugcc/OpenWrts/actions/workflows/manual-build.yml/badge.svg)
+![Release Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square)
+![Latest Release](https://img.shields.io/github/v/release/bigbugcc/OpenWrts?style=flat-square)
+![License](https://img.shields.io/github/license/bigbugcc/OpenWrts?style=flat-square)
 
-- [Action Openwrt 云自动编译](#action-openwrt-云自动编译)
-  - [目录](#目录)
-  - [支持的设备](#支持的设备)
-    - [🎯固件默认设置](#固件默认设置)
-  - [固件特性](#固件特性)
-  - [自带插件](#自带插件)
-  - [文件目录说明](#文件目录说明)
-  - [定制固件](#定制固件)
-    - [注意事项](#注意事项)
-  - [固件预览](#固件预览)
-  - [版权说明](#版权说明)
-  - [项目支持](#项目支持)
-  - [Stargazers over time](#stargazers-over-time)
+## Firmware Builds
 
-<br>
+The firmware build list is maintained in [`manifests/builds.json`](./manifests/builds.json). The scheduled workflow runs weekly and alternates between LEDE and ImmortalWrt in `auto` mode.
 
-## 📢 新功能：动态源选择
+| Source | Device ID | Platform | Flavor | Workflow status | Downloads |
+| --- | --- | --- | --- | --- | --- |
+| `lede` | `x86_64` | x86_64 generic | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi3` | Raspberry Pi 3B/3B+ | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi4` | Raspberry Pi 4B | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `lede` | `rockchip` | R68S, NanoPi R2S/R4S/R5C/R5S, Orange Pi R1 Plus | `standard` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `x86_64-lite` | x86_64 generic | `lite` | ![Weekly Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/weekly-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 
-🎉 现在所有工作流都支持通过 `REPO` 环境变量动态选择 OpenWrt 源代码仓库！
+## LuCI Plugins
 
-支持的源：
-- **lede** - [Lean's LEDE](https://github.com/coolsnowwolf/lede) (默认)
-- **immortalwrt** - [ImmortalWrt](https://github.com/immortalwrt/immortalwrt)
+### LEDE Standard
 
-**使用方法**：编辑工作流文件 (`.github/workflows/*.yml`) 中的 `REPO` 字段：
+| Category | Plugins |
+| --- | --- |
+| Store and proxy | `luci-app-store`, `luci-app-openclash`, `luci-app-passwall2`, `luci-app-ssr-plus` |
+| Network | `luci-app-ddns`, `luci-app-mwan3`, `luci-app-n2n`, `luci-app-openvpn`, `luci-app-softethervpn`, `luci-app-syncdial`, `luci-app-upnp`, `luci-app-wireguard`, `luci-app-zerotier`, `luci-app-smartdns` |
+| Services | `luci-app-adguardhome`, `luci-app-docker`, `luci-app-dockerman`, `luci-app-filebrowser`, `luci-app-frpc`, `luci-app-nfs`, `luci-app-nps`, `luci-app-samba4`, `luci-app-ttyd`, `luci-app-vsftpd` |
+| System and tools | `luci-app-accesscontrol`, `luci-app-arpbind`, `luci-app-autoreboot`, `luci-app-cifs-mount`, `luci-app-commands`, `luci-app-control-timewol`, `luci-app-diskman`, `luci-app-filetransfer`, `luci-app-firewall`, `luci-app-netdata`, `luci-app-nlbwmon`, `luci-app-onliner`, `luci-app-pushbot`, `luci-app-qos`, `luci-app-serverchan`, `luci-app-usb-printer`, `luci-app-vlmcsd`, `luci-app-wol` |
+| Extra apps | `luci-app-ipsec-vpnd`, `luci-app-mentohust`, `luci-app-oaf`, `luci-app-qbittorrent_static`, `luci-app-qbittorrent-simple_dynamic`, `luci-app-turboacc` |
+| Themes | `luci-theme-argon`, `luci-theme-bootstrap`, `luci-theme-infinityfreedom`, `luci-theme-material`, `luci-theme-netgear`, `luci-theme-neobird` |
+
+### ImmortalWrt Lite
+
+| Category | Plugins |
+| --- | --- |
+| Store and proxy | `luci-app-store`, `luci-app-openclash`, `luci-app-passwall2`, `luci-app-ssr-plus` |
+| Network | `luci-app-accesscontrol`, `luci-app-smartdns`, `luci-app-turboacc`, `luci-proto-wireguard` |
+| Services | `luci-app-docker`, `luci-app-dockerman`, `luci-app-filetransfer`, `luci-app-firewall`, `luci-app-netdata`, `luci-app-oaf`, `luci-app-onliner`, `luci-app-ttyd` |
+| System defaults | `default-settings`, `default-settings-chn`, `luci-app-autoreboot` |
+| Themes | `luci-theme-argon`, `luci-theme-bootstrap`, `luci-theme-material` |
+
+## Supported Sources
+
+| Source ID | Upstream repository | Default branch | Notes |
+| --- | --- | --- | --- |
+| `lede` | <https://github.com/coolsnowwolf/lede> | `master` | Lean LEDE, currently used for standard builds |
+| `immortalwrt` | <https://github.com/immortalwrt/immortalwrt> | `master` | ImmortalWrt, currently used for the x86_64 lite build |
+
+The two sources do not share the same SDK, feeds, LuCI version, package set, or plugin compatibility guarantees. Application configs and package scripts are therefore source-specific.
+
+## Workflows
+
+| Workflow | Purpose |
+| --- | --- |
+| [`weekly-release.yml`](./.github/workflows/weekly-release.yml) | Scheduled weekly release. `auto` mode alternates between LEDE and ImmortalWrt by ISO week parity |
+| [`manual-build.yml`](./.github/workflows/manual-build.yml) | Manual build entry point with source, device, flavor, branch, and release controls |
+| [`build-openwrt.yml`](./.github/workflows/build-openwrt.yml) | Reusable workflow that builds one matrix item |
+| [`ActionTrigger.yml`](./.github/workflows/ActionTrigger.yml) | Manual maintenance workflow for cleaning old workflow runs and releases |
+
+The scheduled workflow uses UTC:
+
 ```yaml
-env:
-  REPO: lede  # 修改为 'lede' 或 'immortalwrt'
+schedule:
+  - cron: "23 16 * * 6"
 ```
 
-详细说明请查看：[源代码仓库选择指南](./docs/REPO_SELECTION.md)
+This is roughly Sunday 00:23 in Asia/Shanghai.
 
-<br>
+## Build Flow
 
-## 支持的设备
-|           支持的设备        |         固类别         |        Action         |            状态          |              下载页          |
-| :------------------------: | :---------------------: | :-------------------: | :-------------------: | :--------------------------: |
-|             x86_64                    |  [LEDE](https://github.com/coolsnowwolf/lede) |[🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64.yml) | ![x86_64](https://github.com/bigbugcc/openwrts/actions/workflows/x86_64.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-| x86_64Lite | [LEDE](https://github.com/coolsnowwolf/lede) |[🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/x86_64Lite.yml) | ![x86_64Lite](https://github.com/bigbugcc/openwrts/actions/workflows/x86_64Lite.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             树莓派 3B/3B+             | [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/RaspberryPi3.yml) | ![RaspberryPi3](https://github.com/bigbugcc/openwrts/actions/workflows/RaspberryPi3.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             树莓派 4B             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/RaspberryPi4.yml) | ![RaspberryPi4](https://github.com/bigbugcc/openwrts/actions/workflows/RaspberryPi4.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             树莓派 5             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/RaspberryPi5.yml) | ![RaspberryPi5](https://github.com/bigbugcc/openwrts/actions/workflows/RaspberryPi5.yml/badge.svg) |  [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             NanoPi R2S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip.yml) | ![R2S](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             NanoPi R4S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip.yml) | ![R4S](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             NanoPi R5C             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip.yml) | ![R5C](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             NanoPi R5S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip.yml) | ![R5S](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             FastRhino R68S             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip.yml) | ![R68S](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-|             Orange Pi R1 Plus             |  [LEDE](https://github.com/coolsnowwolf/lede) | [🍕](https://github.com/bigbugcc/OpenWrts/actions/workflows/Rockchip.yml) | ![OrangePiR1](https://github.com/bigbugcc/openwrts/actions/workflows/Rockchip.yml/badge.svg) | [✔](https://github.com/bigbugcc/OpenWrts/releases) |
-
-<br>
-
-### 🎯固件默认设置
-- 路由器地址: `192.168.10.1`
-- 默认用户名: `root`
-- 默认密码  : `password`
-
-<br>
-
-## 固件特性
-⏰ 固件编译改为`周更`(稳定为主，减少资源浪费)
-
-✨ iStore应用商店 [AppStore](./assets/images/appstore.png)
-
-✨ 自带常用的插件
-
-✨ Arm集成所有openwrt的USB驱动
-
-✨ ~~集成Python3.x(带pip)环境~~
-
-✨ 集成Docker-CE
-
-✨ ~~集成Node.js(14.xLTS 带npm、yarn)~~
-
-✨ 全新的 [Them](https://github.com/jerrykuku/luci-theme-argon)
-
-✨ x86_64 vmdk固件集成vm-tools
-
-✨ x86_64 iso格式镜像
-
-✨ x86_64 Lite版本(必要插件&应用商店)
-
-<br>
-
-## 自带插件
-🍕 默认插件
-- PassWall2 / SSR Plus / OpenClash
-- AdGuard Home
-- Mentohust
-- ~~luci-app-vssr~~
-- luci-adbyby-plus
-- luci-app-unblockmusic
-- luci-app-ddns
-- luci-app-pushbot (全能推送)
-- luci-app-onliner
-- luci-app-ttyd
-- luci-app-turboacc
-- luci-app-upnp
-- luci-app-netdata
-- luci-usb-printer
-- luci-app-nps
-- luci-app-frpc
-- luci-app-n2n
-- luci-app-syncdial (多播插件)
-- luci-app-turboacc
-- luci-app-kms
-- luci-app-docker
-- luci-app-serverchan
-- luci-app-control-timewol (定时wol唤醒)
-- luci-app-aliyundrive-webdav (阿里云盘)
-- luci-app-filebrowser
-- luci-app-nfs   
-......
-
-<br>
-
-## 文件目录说明
-eg:
-
+```text
+weekly/manual workflow
+  -> scripts/resolve-matrix.py generates the build matrix
+  -> build-openwrt.yml
+     -> scripts/prepare-env.sh
+     -> scripts/clone-source.sh
+     -> scripts/apply-system.sh
+     -> scripts/apply-feeds.sh
+     -> scripts/apply-packages.sh
+     -> scripts/compose-config.sh
+     -> scripts/build.sh
+     -> upload artifact / release
 ```
-filetree
-├── .github/workflows
-│  ├── Rockchip.yml
-│  ├── RaspberryPi3.yml
-│  ├── RaspberryPi4.yml
-│  ├── RaspberryPi5.yml
-│  ├── x86_64.yml
-│  ├── x86_64Lite.yml
-│  ├── update-checker.yml
-├── /configs/ (配置文件目录)   
-│  ├── /luci/ (app插件配置)   
-│  |  ├── Lite.config (简洁配置)   
-│  |  ├── Standard.config (标准配置 大量插件)
-│  ├── RPi3.config
-│  ├── RPi4.config
-│  ├── RPi5.config
-│  ├── x86_64.config
-│  ├── Rockchip.config
-├── yum.sh (源代码克隆脚本 - 根据REPO变量克隆lede或immortalwrt源)
-├── configure.sh (固件参数修改)
-├── package.sh (luci-app)
 
-Tips:
-yum.sh - 源代码克隆脚本，根据环境变量REPO选择克隆lede或immortalwrt源
-x86.conf | RPi4.config - 该类型配置文件主要为机型配置文件
-Standard.conf / Lite.config - 主要用于配置固件插件应用 
-configure.sh - 用于修改默认系统设置（如IP地址）和添加feeds源
-package.sh - 用于克隆和安装额外的luci应用插件
+## Repository Layout
+
+```text
+.github/workflows/
+  build-openwrt.yml      reusable build workflow
+  weekly-release.yml     scheduled source-rotation release workflow
+  manual-build.yml       manual build workflow
+  ActionTrigger.yml      manual maintenance workflow
+
+manifests/
+  builds.json            build matrix definition
+
+feeds/
+  lede.conf              LEDE feeds
+  immortalwrt.conf       ImmortalWrt feeds
+
+packages/
+  lede.sh                LEDE third-party packages
+  immortalwrt.sh         ImmortalWrt third-party packages
+
+configs/
+  targets/               source-specific target/device configs
+  apps/                  source-specific LuCI app configs
+  drivers/               source-specific driver extension configs
+
+scripts/
+  prepare-env.sh         install build dependencies
+  clone-source.sh        clone the selected upstream source
+  apply-system.sh        apply default system settings
+  apply-feeds.sh         append source-specific feeds
+  apply-packages.sh      clone source-specific third-party packages
+  compose-config.sh      compose .config and run make defconfig
+  build.sh               download dependencies and compile firmware
+  resolve-matrix.py      parse manifests/builds.json
 ```
-<br>
 
-## 定制固件
-1. Fork 此项目
-2. 按需修改 ```yum.sh```（源选择）、```configure.sh```（系统设置） 和 ```package.sh```（插件） 文件
-3. 上传你自己的 ```xx.config``` 配置文件到configs目录
-4. 添加或修改自己的``````xx.yml``````文件
-5. 最后根据个人喜好修改 ```update-checker.yml``` 需自行添加 ```Actions secrets``` (触发自动编译)
+The root-level `source.sh`, `environment.sh`, `configure.sh`, and `package.sh` files are compatibility wrappers. They forward to the newer scripts under `scripts/`.
 
-### 注意事项：
-📌 选择源代码仓库 👉 ```yum.sh``` 中的 REPO 变量 或工作流中的 REPO 环境变量   
-📌 修改默认系统参数 👉 ```configure.sh```   
-📌 添加其它Luci插件 👉 ```package.sh```   
-📌 插件 / 应用配置文件 👉 ```configs/Standard.config```   
-<br>
+## Cache Strategy
 
-## 固件预览
-**主界面(主题一)：**
-![主界面](./assets/images/openwrt.png)
+The new workflow caches `dl` and `.ccache` with `actions/cache`. The cache key includes:
 
-**应用商店/插件**
-![应用商店/插件](./assets/images/appstore.png)
+```text
+repo + branch + cache_scope + hash(feeds/packages/scripts/configs/manifests)
+```
 
-**服务/插件：**
-![服务/插件](./assets/images/service.png)
+This avoids reusing incompatible cache data across LEDE, ImmortalWrt, devices, and firmware flavors.
 
-**网络：**
-![网络](./assets/images/network.png)
+## Default Firmware Settings
 
-**经典主题二：**
-![登录页](./assets/images/infinityfreedom-theme.png)
+- Management IP: `192.168.10.1`
+- User: `root`
+- Password: `password`
 
-**主界面：**
-![主界面](./assets/images/infinityfreedom-theme-main.png)
+## Manual Builds
 
+Open GitHub Actions and run `Manual OpenWrt Build`, then choose:
 
-## 版权说明
+- `repo`: `lede` or `immortalwrt`
+- `device`: `all` or a device ID from the matrix
+- `flavor`: `all`, `standard`, or `lite`
+- `branch`: leave empty to use the manifest default, or provide an upstream branch
+- `upload_release`: whether to upload firmware to GitHub Releases
 
-该项目签署了MIT 授权许可，详情请参阅 [LICENSE](https://github.com/bigbugcc/OpenWrts/blob/main/LICENSE)
+## Local Matrix Checks
 
+```powershell
+python scripts\resolve-matrix.py --repo lede --device x86_64
+python scripts\resolve-matrix.py --repo immortalwrt --device all
+python scripts\resolve-matrix.py --repo auto
+```
 
-## 项目支持
-- [P3TERX/Actions-OpenWrt](https://github.com/P3TERX/Actions-OpenWrt)
-- [coolsnowwolf/lede](https://github.com/coolsnowwolf/lede)
-- [luci-theme-argon](https://github.com/jerrykuku/luci-theme-argon)
-- [istore](https://github.com/linkease/istore)
+If Python is not available in `PATH`, run the script with the full path to your Python executable.
 
-## Stargazers over time
-[![Stargazers over time](https://starchart.cc/bigbugcc/OpenWrts.svg)](https://starchart.cc/bigbugcc/OpenWrts)
+## Adding a Device
 
-<!-- links -->
-[your-project-path]:https://github.com/bigbugcc/OpenWrts/
-[contributors-shield]: https://img.shields.io/github/contributors/bigbugcc/OpenWrts?style=flat-square
-[contributors-url]: https://github.com/bigbugcc/OpenWrts/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/bigbugcc/OpenWrts?style=flat-square
-[forks-url]: https://github.com/bigbugcc/OpenWrts/network/members
-[stars-shield]: https://img.shields.io/github/stars/bigbugcc/OpenWrts?style=flat-square
-[stars-url]: https://github.com/bigbugcc/OpenWrts/stargazers
-[issues-shield]: https://img.shields.io/github/issues/bigbugcc/OpenWrts?style=flat-square
-[issues-url]: https://img.shields.io/github/issues/bigbugcc/OpenWrts
-[license-shield]: https://img.shields.io/github/license/bigbugcc/OpenWrts?style=flat-square
-[license-url]: https://github.com/bigbugcc/OpenWrts/blob/master/LICENSE
+1. Add the target/device config under `configs/targets/<repo>/`.
+2. Add or reuse an app config under `configs/apps/<repo>/`.
+3. Add driver extensions under `configs/drivers/<repo>/` when needed.
+4. Add the device entry to `manifests/builds.json`.
+5. Update `packages/<repo>.sh` if the device needs extra packages.
+
+## Screenshots
+
+![OpenWrt](./assets/images/openwrt.png)
+
+![App Store](./assets/images/appstore.png)
+
+![Service](./assets/images/service.png)
+
+![Network](./assets/images/network.png)
+
+## Credits
+
+- <https://github.com/P3TERX/Actions-OpenWrt>
+- <https://github.com/coolsnowwolf/lede>
+- <https://github.com/immortalwrt/immortalwrt>
+- <https://github.com/jerrykuku/luci-theme-argon>
+- <https://github.com/linkease/istore>
+
+## License
+
+This project is released under the MIT License. See [`LICENSE`](./LICENSE).

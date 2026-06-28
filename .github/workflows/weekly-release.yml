@@ -1,0 +1,63 @@
+name: Weekly OpenWrt Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Source repo to build. Use auto for weekly LEDE/ImmortalWrt rotation.
+        required: true
+        type: choice
+        options:
+          - auto
+          - lede
+          - immortalwrt
+        default: auto
+      upload_release:
+        description: Upload firmware to GitHub Releases.
+        required: true
+        type: boolean
+        default: true
+  schedule:
+    - cron: "23 16 * * 6"
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-22.04
+    outputs:
+      repo: ${{ steps.matrix.outputs.repo }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      upload_release: ${{ steps.matrix.outputs.upload_release }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve weekly build matrix
+        id: matrix
+        env:
+          REQUESTED_REPO: ${{ github.event.inputs.repo || 'auto' }}
+          REQUESTED_UPLOAD_RELEASE: ${{ github.event.inputs.upload_release || 'true' }}
+        run: |
+          python3 scripts/resolve-matrix.py --repo "$REQUESTED_REPO"
+          echo "upload_release=$REQUESTED_UPLOAD_RELEASE" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.resolve.outputs.matrix) }}
+    uses: ./.github/workflows/build-openwrt.yml
+    with:
+      repo: ${{ matrix.repo }}
+      branch: ${{ matrix.branch }}
+      device: ${{ matrix.id }}
+      op_name: ${{ matrix.op_name }}
+      flavor: ${{ matrix.flavor }}
+      target_config: ${{ matrix.target_config }}
+      app_config: ${{ matrix.app_config }}
+      driver_config: ${{ matrix.driver_config }}
+      cache_scope: ${{ matrix.cache_scope }}
+      upload_release: ${{ needs.resolve.outputs.upload_release == 'true' }}
+    secrets: inherit

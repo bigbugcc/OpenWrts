@@ -1,0 +1,161 @@
+name: Build OpenWrt
+
+on:
+  workflow_call:
+    inputs:
+      repo:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+      device:
+        required: true
+        type: string
+      op_name:
+        required: true
+        type: string
+      flavor:
+        required: true
+        type: string
+      target_config:
+        required: true
+        type: string
+      app_config:
+        required: true
+        type: string
+      driver_config:
+        required: false
+        type: string
+        default: ""
+      cache_scope:
+        required: true
+        type: string
+      upload_release:
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: openwrt-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.device }}-${{ inputs.flavor }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    env:
+      REPO: ${{ inputs.repo }}
+      REPO_BRANCH: ${{ inputs.branch }}
+      TZ: Asia/Shanghai
+      OPENWRT_DIR: /mnt/workdir/openwrt
+      CCACHE_DIR: /mnt/workdir/openwrt/.ccache
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /etc/apt/sources.list.d/*
+          sudo -E apt-get -qq update
+          bash "$GITHUB_WORKSPACE/scripts/prepare-env.sh"
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p /mnt/workdir
+          sudo chown "$USER:$(id -gn)" /mnt/workdir
+
+      - name: Clone source code
+        working-directory: /mnt/workdir
+        run: |
+          df -hT "$PWD"
+          bash "$GITHUB_WORKSPACE/scripts/clone-source.sh" openwrt
+          ln -sf /mnt/workdir/openwrt "$GITHUB_WORKSPACE/openwrt"
+
+      - name: Cache downloads and ccache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /mnt/workdir/openwrt/dl
+            /mnt/workdir/openwrt/.ccache
+          key: openwrt-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.cache_scope }}-${{ hashFiles('feeds/**', 'packages/**', 'scripts/**', 'configs/**', 'manifests/**') }}
+          restore-keys: |
+            openwrt-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.cache_scope }}-
+
+      - name: Apply system settings and feeds
+        run: |
+          bash "$GITHUB_WORKSPACE/scripts/apply-system.sh"
+          bash "$GITHUB_WORKSPACE/scripts/apply-feeds.sh"
+
+      - name: Update feeds
+        run: cd "$OPENWRT_DIR" && ./scripts/feeds update -a
+
+      - name: Install feeds
+        run: cd "$OPENWRT_DIR" && ./scripts/feeds install -a
+
+      - name: Apply repo packages
+        run: bash "$GITHUB_WORKSPACE/scripts/apply-packages.sh"
+
+      - name: Compose configuration
+        env:
+          TARGET_CONFIG: ${{ inputs.target_config }}
+          APP_CONFIG: ${{ inputs.app_config }}
+          DRIVER_CONFIG: ${{ inputs.driver_config }}
+        run: bash "$GITHUB_WORKSPACE/scripts/compose-config.sh"
+
+      - name: Build firmware
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh"
+
+      - name: Check space usage
+        if: always()
+        run: df -hT
+
+      - name: Organize files
+        id: organize
+        run: |
+          firmware_dir="$(find "$OPENWRT_DIR/bin/targets" -mindepth 2 -maxdepth 2 -type d | head -n 1)"
+          if [ -z "$firmware_dir" ]; then
+            echo "Firmware directory not found."
+            exit 1
+          fi
+          rm -rf "$firmware_dir/packages"
+          echo "FIRMWARE=$firmware_dir" >> "$GITHUB_ENV"
+          echo "file_date=$(date +"%Y%m%d%H%M")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload firmware directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenWrt_${{ inputs.repo }}_${{ inputs.device }}_${{ inputs.flavor }}_${{ steps.organize.outputs.file_date }}
+          path: ${{ env.FIRMWARE }}
+
+      - name: Generate release body
+        if: ${{ inputs.upload_release }}
+        run: |
+          release_tag="${{ inputs.repo }}-${{ inputs.device }}-${{ steps.organize.outputs.file_date }}"
+          release_name="OpenWrt-${{ inputs.repo }}-${{ inputs.op_name }}-${{ inputs.flavor }}"
+          echo "RELEASE_TAG=$release_tag" >> "$GITHUB_ENV"
+          echo "RELEASE_NAME=$release_name" >> "$GITHUB_ENV"
+          {
+            echo "![Release Downloads](https://img.shields.io/github/downloads/${{ github.repository }}/$release_tag/total?style=flat-square)"
+            echo ""
+            echo "Repository: ${{ inputs.repo }}"
+            echo "Branch: ${{ inputs.branch }}"
+            echo "Device: ${{ inputs.op_name }}"
+            echo "Flavor: ${{ inputs.flavor }}"
+          } > release.txt
+
+      - name: Upload firmware to release
+        uses: softprops/action-gh-release@v1
+        if: ${{ inputs.upload_release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: ${{ env.RELEASE_NAME }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          body_path: release.txt
+          files: ${{ env.FIRMWARE }}/*

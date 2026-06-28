@@ -1,36 +1,33 @@
 name: ActionTrigger
 
-env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
-  UPLOAD_RELEASE: true
-
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 16 */7 * *'
+
+env:
+  UPLOAD_RELEASE: true
+
+permissions:
+  contents: write
+  actions: write
 
 jobs:
-  check:
+  maintenance:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: AutoTrigger
-      uses: bigbugcc/ActionBot@main
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Delete workflow runs
-      uses: bigbugcc/delete-workflow-runs@main
-      with:
-        keep_minimum_runs: 1
+      - name: Delete workflow runs
+        uses: bigbugcc/delete-workflow-runs@main
+        with:
+          keep_minimum_runs: 1
 
-    - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@v0.2.0
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 18
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove old Releases
+        uses: dev-drprasad/delete-older-releases@v0.2.0
+        if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+        with:
+          keep_latest: 18
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

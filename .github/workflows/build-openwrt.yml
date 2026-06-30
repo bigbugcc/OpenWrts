@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialization environment
         env:
@@ -89,8 +89,7 @@ jobs:
 
       - name: Apply system settings and feeds
         run: |
-          bash "$GITHUB_WORKSPACE/scripts/apply-system.sh"
-          bash "$GITHUB_WORKSPACE/scripts/apply-feeds.sh"
+          bash "$GITHUB_WORKSPACE/scripts/apply-openwrt.sh" system feeds
 
       - name: Update feeds
         run: cd "$OPENWRT_DIR" && ./scripts/feeds update -a
@@ -99,7 +98,7 @@ jobs:
         run: cd "$OPENWRT_DIR" && ./scripts/feeds install -a
 
       - name: Apply repo packages
-        run: bash "$GITHUB_WORKSPACE/scripts/apply-packages.sh"
+        run: bash "$GITHUB_WORKSPACE/scripts/apply-openwrt.sh" packages
 
       - name: Compose configuration
         env:

@@ -4,6 +4,7 @@ set -euo pipefail
 REPO="${REPO:-lede}"
 REPO_BRANCH="${REPO_BRANCH:-master}"
 CLONE_DIR="${1:-openwrt}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "======================================"
 echo "OpenWrt Source Clone Script"
@@ -13,21 +14,8 @@ echo "REPO_BRANCH: $REPO_BRANCH"
 echo "CLONE_DIR: $CLONE_DIR"
 echo "======================================"
 
-case "$REPO" in
-  lede)
-    REPO_URL="https://github.com/coolsnowwolf/lede"
-    echo "Using Lean's LEDE source"
-    ;;
-  immortalwrt)
-    REPO_URL="https://github.com/immortalwrt/immortalwrt"
-    echo "Using ImmortalWrt source"
-    ;;
-  *)
-    echo "Error: Unknown REPO value: $REPO"
-    echo "Supported values: lede, immortalwrt"
-    exit 1
-    ;;
-esac
+REPO_URL="$(node "$ROOT_DIR/scripts/openwrts.mjs" repo-url --repo "$REPO")"
+echo "Using $REPO source: $REPO_URL"
 
 if [ -d "$CLONE_DIR" ]; then
   echo "Error: Directory '$CLONE_DIR' already exists."

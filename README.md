@@ -2,7 +2,7 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-OpenWrts builds OpenWrt firmware with GitHub Actions. The default documentation language is English; a Chinese version is available above.
+OpenWrts builds OpenWrt firmware with GitHub Actions. 
 
 <p align="center">
   <img src="./assets/images/action1.jpg" alt="OpenWrts" width="500" />
@@ -16,7 +16,7 @@ OpenWrts builds OpenWrt firmware with GitHub Actions. The default documentation 
 
 ## Firmware Builds
 
-The firmware build list is maintained in [`manifests/builds.json`](./manifests/builds.json). The scheduled workflow controls timed releases and alternates between LEDE and ImmortalWrt in `auto` mode.
+The firmware build list is synchronized into [`manifests/builds.json`](./manifests/builds.json) from config fragments under `configs/` when workflow generation runs. The scheduled workflow controls timed releases and alternates between LEDE and ImmortalWrt in `auto` mode.
 
 | Source | Device ID | Platform | Flavor | Workflow status | Downloads |
 | --- | --- | --- | --- | --- | --- |
@@ -80,13 +80,15 @@ This is roughly Sunday 00:23 in Asia/Shanghai.
 
 ```text
 scheduled/manual workflow
-  -> scripts/resolve-matrix.py generates the build matrix
+  -> scripts/openwrts.mjs validate-manifest
+  -> scripts/openwrts.mjs generate-workflows --check
+  -> scripts/openwrts.mjs resolve-matrix generates the build matrix
   -> build-openwrt.yml
      -> scripts/prepare-env.sh
      -> scripts/clone-source.sh
-     -> scripts/apply-system.sh
-     -> scripts/apply-feeds.sh
-     -> scripts/apply-packages.sh
+     -> scripts/apply-openwrt.sh system feeds
+     -> OpenWrt feeds update/install
+     -> scripts/apply-openwrt.sh packages
      -> scripts/compose-config.sh
      -> scripts/build.sh
      -> upload artifact / release
@@ -117,17 +119,28 @@ configs/
   drivers/               source-specific driver extension configs
 
 scripts/
+  openwrts.mjs           Node.js CLI for manifest validation, matrix resolution, and workflow generation
   prepare-env.sh         install build dependencies
   clone-source.sh        clone the selected upstream source
-  apply-system.sh        apply default system settings
-  apply-feeds.sh         append source-specific feeds
-  apply-packages.sh      clone source-specific third-party packages
+  apply-openwrt.sh       apply system defaults, source-specific feeds, and repo packages
   compose-config.sh      compose .config and run make defconfig
   build.sh               download dependencies and compile firmware
-  resolve-matrix.py      parse manifests/builds.json
 ```
 
-The root-level `source.sh`, `environment.sh`, `configure.sh`, and `package.sh` files are compatibility wrappers. They forward to the newer scripts under `scripts/`.
+The old root-level `source.sh`, `environment.sh`, `configure.sh`, and `package.sh` compatibility wrappers have been removed. New automation should call scripts under `scripts/` directly.
+
+## Workflow Generation
+
+GitHub Actions `workflow_dispatch` choice options are static YAML values. They cannot be loaded dynamically at runtime in the Actions UI. Regenerate after changing target, app, or driver config fragments:
+
+```powershell
+node scripts\openwrts.mjs generate-workflows
+node scripts\openwrts.mjs generate-workflows --check
+```
+
+`generate-workflows` first scans `configs/targets/<repo>/*.config` and `configs/apps/<repo>/*.config`, updates `manifests/builds.json`, and then writes the workflow options. Existing manifest metadata such as `op_name` is preserved, so you can edit display names after the first generation.
+
+The generated workflows contain a validation step that fails when committed manifest or workflow options are out of sync with the config fragments.
 
 ## Cache Strategy
 
@@ -151,27 +164,32 @@ Open GitHub Actions and run `Manual OpenWrt Build`, then choose:
 
 - `repo`: `auto`, `lede`, or `immortalwrt`. Use `auto` to resolve the source from the selected device; for `device=all`, `auto` follows the scheduled rotation rule.
 - `device`: `all` or a device ID from the matrix
-- `flavor`: `all`, `standard`, or `lite`
+- `flavor`: `standard`, `lite`, or `all`. The default is `standard` with `repo=lede`. Use `all` when you want every matching manifest entry for the selected repo/device.
 - `branch`: leave empty to use the manifest default, or provide an upstream branch
 - `upload_release`: whether to upload firmware to GitHub Releases
+
+For example, `repo=lede`, `device=all`, `flavor=lite` builds all LEDE targets with `configs/apps/lede/lite.config`. If a selected repo/device/flavor combination does not exist, matrix resolution stops before compilation and reports the available flavors.
 
 ## Local Matrix Checks
 
 ```powershell
-python scripts\resolve-matrix.py --repo lede --device x86_64
-python scripts\resolve-matrix.py --repo immortalwrt --device all
-python scripts\resolve-matrix.py --repo auto
+node scripts\openwrts.mjs validate-manifest
+node scripts\openwrts.mjs resolve-matrix --repo lede --device x86_64
+node scripts\openwrts.mjs resolve-matrix --repo immortalwrt --device all
+node scripts\openwrts.mjs resolve-matrix --repo auto
 ```
 
-If Python is not available in `PATH`, run the script with the full path to your Python executable.
+The Node.js CLI uses only built-in Node modules and does not require `npm install`.
 
 ## Adding a Device
 
 1. Add the target/device config under `configs/targets/<repo>/`.
 2. Add or reuse an app config under `configs/apps/<repo>/`.
 3. Add driver extensions under `configs/drivers/<repo>/` when needed.
-4. Add the device entry to `manifests/builds.json`.
-5. Update `packages/<repo>.sh` if the device needs extra packages.
+4. Update `packages/<repo>.sh` if the device needs extra packages.
+5. Run `node scripts\openwrts.mjs generate-workflows` to sync `manifests/builds.json` and workflow choices.
+6. Optionally edit the generated `op_name` in `manifests/builds.json` for a nicer release name, then rerun `generate-workflows`.
+7. Run `node scripts\openwrts.mjs validate-manifest`.
 
 ## Screenshots
 

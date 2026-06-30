@@ -2,7 +2,7 @@
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
-OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。默认 README 为英文版，当前页面为中文说明。
+OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。
 
 <p align="center">
   <img src="./assets/images/action1.jpg" alt="OpenWrts" width="500" />
@@ -16,7 +16,7 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。默认 REA
 
 ## 固件构建列表
 
-固件构建列表统一维护在 [`manifests/builds.json`](./manifests/builds.json)。定时 workflow 负责计划发布，`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换。
+固件构建列表会在生成 workflow 时从 `configs/` 下的配置片段同步到 [`manifests/builds.json`](./manifests/builds.json)。定时 workflow 负责计划发布，`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换。
 
 | 源码 | 设备 ID | 平台 | 风格 | Workflow 状态 | 下载统计 |
 | --- | --- | --- | --- | --- | --- |
@@ -80,13 +80,15 @@ schedule:
 
 ```text
 scheduled/manual workflow
-  -> scripts/resolve-matrix.py 生成构建矩阵
+  -> scripts/openwrts.mjs validate-manifest
+  -> scripts/openwrts.mjs generate-workflows --check
+  -> scripts/openwrts.mjs resolve-matrix 生成构建矩阵
   -> build-openwrt.yml
      -> scripts/prepare-env.sh
      -> scripts/clone-source.sh
-     -> scripts/apply-system.sh
-     -> scripts/apply-feeds.sh
-     -> scripts/apply-packages.sh
+     -> scripts/apply-openwrt.sh system feeds
+     -> OpenWrt feeds update/install
+     -> scripts/apply-openwrt.sh packages
      -> scripts/compose-config.sh
      -> scripts/build.sh
      -> 上传 artifact / release
@@ -117,17 +119,28 @@ configs/
   drivers/               按源码隔离的驱动扩展配置
 
 scripts/
+  openwrts.mjs           Node.js CLI，用于 manifest 校验、矩阵解析和 workflow 生成
   prepare-env.sh         安装编译依赖
   clone-source.sh        拉取选定的上游源码
-  apply-system.sh        应用默认系统设置
-  apply-feeds.sh         追加按源码隔离的 feeds
-  apply-packages.sh      拉取按源码隔离的第三方插件
+  apply-openwrt.sh       应用系统默认值、按源码隔离的 feeds 和第三方插件
   compose-config.sh      合成 .config 并执行 make defconfig
   build.sh               下载依赖并编译固件
-  resolve-matrix.py      解析 manifests/builds.json
 ```
 
-根目录下的 `source.sh`、`environment.sh`、`configure.sh` 和 `package.sh` 是兼容包装入口，内部会转发到 `scripts/` 下的新脚本。
+旧的根目录 `source.sh`、`environment.sh`、`configure.sh` 和 `package.sh` 兼容包装入口已移除。新的自动化应直接调用 `scripts/` 下的脚本。
+
+## Workflow 生成
+
+GitHub Actions 的 `workflow_dispatch` 下拉选项是静态 YAML，不能在 Actions UI 打开时动态读取。修改 target、app 或 driver 配置片段后运行：
+
+```powershell
+node scripts\openwrts.mjs generate-workflows
+node scripts\openwrts.mjs generate-workflows --check
+```
+
+`generate-workflows` 会先扫描 `configs/targets/<repo>/*.config` 和 `configs/apps/<repo>/*.config`，更新 `manifests/builds.json`，再写入 workflow 下拉选项。已有 manifest 元数据，例如 `op_name`，会被保留，所以首次生成后可以再调整显示名称。
+
+生成后的 workflow 会在 resolve 阶段检查 manifest 和 workflow 选项是否与配置片段保持同步。
 
 ## 缓存策略
 
@@ -151,27 +164,32 @@ repo + branch + cache_scope + hash(feeds/packages/scripts/configs/manifests)
 
 - `repo`: `auto`、`lede` 或 `immortalwrt`。选择 `auto` 时会根据设备自动匹配源码；当 `device=all` 时，`auto` 使用定时轮换规则。
 - `device`: `all` 或构建矩阵里的设备 ID
-- `flavor`: `all`、`standard` 或 `lite`
+- `flavor`: `standard`、`lite` 或 `all`。默认是 `repo=lede` 搭配 `standard`。`all` 表示构建所选 repo/device 下所有匹配的 manifest 条目。
 - `branch`: 留空使用 manifest 默认分支，也可以填写上游分支
 - `upload_release`: 是否上传固件到 GitHub Releases
+
+例如，`repo=lede`、`device=all`、`flavor=lite` 会用 `configs/apps/lede/lite.config` 构建所有 LEDE target。如果选择的 repo/device/flavor 组合不存在，矩阵解析会在编译前停止，并提示当前可用的 flavor。
 
 ## 本地矩阵检查
 
 ```powershell
-python scripts\resolve-matrix.py --repo lede --device x86_64
-python scripts\resolve-matrix.py --repo immortalwrt --device all
-python scripts\resolve-matrix.py --repo auto
+node scripts\openwrts.mjs validate-manifest
+node scripts\openwrts.mjs resolve-matrix --repo lede --device x86_64
+node scripts\openwrts.mjs resolve-matrix --repo immortalwrt --device all
+node scripts\openwrts.mjs resolve-matrix --repo auto
 ```
 
-如果 Python 不在 `PATH` 中，可以使用 Python 可执行文件的完整路径运行脚本。
+Node.js CLI 只使用 Node 内置模块，不需要执行 `npm install`。
 
 ## 添加新设备
 
 1. 在 `configs/targets/<repo>/` 下添加 target/device 配置。
 2. 在 `configs/apps/<repo>/` 下添加或复用应用配置。
 3. 如有需要，在 `configs/drivers/<repo>/` 下添加驱动扩展。
-4. 在 `manifests/builds.json` 中添加设备项。
-5. 如果设备需要额外插件，更新 `packages/<repo>.sh`。
+4. 如果设备需要额外插件，更新 `packages/<repo>.sh`。
+5. 运行 `node scripts\openwrts.mjs generate-workflows`，同步 `manifests/builds.json` 和 workflow 下拉选项。
+6. 如需更友好的发布名称，可以调整 `manifests/builds.json` 中生成的 `op_name`，然后再次运行 `generate-workflows`。
+7. 运行 `node scripts\openwrts.mjs validate-manifest`。
 
 ## 截图
 

@@ -54,8 +54,8 @@
       "branch": "master",
       "devices": [
         {
-          "id": "x86_64-lite",
-          "op_name": "x86_64Lite",
+          "id": "x86_64",
+          "op_name": "x86_64",
           "flavor": "lite",
           "target_config": "configs/targets/immortalwrt/x86_64.config",
           "app_config": "configs/apps/immortalwrt/lite.config",

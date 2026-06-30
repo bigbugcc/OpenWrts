@@ -19,7 +19,6 @@ on:
         options:
           - all
           - x86_64
-          - x86_64-lite
           - rpi3
           - rpi4
           - rpi5

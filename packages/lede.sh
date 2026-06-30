@@ -17,6 +17,6 @@ mkdir -p package/otherapp
 
 clone_package https://github.com/destan19/OpenAppFilter package/otherapp/OpenAppFilter
 clone_package https://github.com/thinktip/luci-theme-neobird.git package/otherapp/luci-theme-neobird
-clone_package https://github.com/KyleRicardo/MentoHUST-OpenWrt-ipk.git package/otherapp/mentohust
+#clone_package https://github.com/KyleRicardo/MentoHUST-OpenWrt-ipk.git package/otherapp/mentohust
 clone_package https://github.com/vernesong/OpenClash.git package/luci-app-openclash
-clone_package https://github.com/kenzok8/small-package package/otherapp/small-package
+#clone_package https://github.com/kenzok8/small-package package/otherapp/small-package

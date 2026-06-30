@@ -59,5 +59,16 @@ cat "$APP_CONFIG_PATH" >> "$OPENWRT_DIR/.config"
 
 cd "$OPENWRT_DIR"
 make defconfig
-sed -i '/CONFIG_DEFAULT_luci/d' .config
+
+awk '
+  /^CONFIG_DEFAULT_luci[^=]*=/ {
+    sub(/=.*/, "", $0)
+    print "# " $0 " is not set"
+    next
+  }
+  { print }
+' .config > .config.tmp
+mv .config.tmp .config
+
+make defconfig
 cat .config

@@ -108,8 +108,23 @@ jobs:
           DRIVER_CONFIG: ${{ inputs.driver_config }}
         run: bash "$GITHUB_WORKSPACE/scripts/compose-config.sh"
 
-      - name: Build firmware
-        run: bash "$GITHUB_WORKSPACE/scripts/build.sh"
+      - name: Download package sources
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh" download
+
+      - name: Build tools
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh" tools
+
+      - name: Build toolchain
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh" toolchain
+
+      - name: Build target kernel
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh" target
+
+      - name: Build packages
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh" packages
+
+      - name: Build firmware images
+        run: bash "$GITHUB_WORKSPACE/scripts/build.sh" images
 
       - name: Check space usage
         if: always()

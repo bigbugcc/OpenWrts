@@ -50,8 +50,8 @@ flowchart TD
     OpenWrtTree --> Cache["actions/cache@v4<br/>dl + .ccache"]
     Cache --> ApplyBase["scripts/apply-openwrt.sh<br/>system feeds"]
     ApplyBase --> ConfigGenerate["package/base-files/files/bin/config_generate<br/>LAN IP 192.168.10.1"]
-    ApplyBase --> FeedAppend["append feeds/$REPO.conf<br/>to feeds.conf.default"]
-    Feeds["feeds/lede.conf<br/>feeds/immortalwrt.conf"] --> FeedAppend
+    ApplyBase --> FeedAppend["append common + repo feeds<br/>to feeds.conf.default"]
+    Feeds["feeds/common.conf<br/>feeds/$REPO.conf"] --> FeedAppend
 
     FeedAppend --> FeedsUpdate["./scripts/feeds update -a"]
     FeedsUpdate --> FeedsInstall["./scripts/feeds install -a"]
@@ -60,8 +60,8 @@ flowchart TD
     RepoPackageScript --> PackageClones["git clone third-party packages<br/>into OpenWrt package tree"]
 
     PackageClones --> Compose["scripts/compose-config.sh"]
-    TargetCfg["configs/targets/$REPO/*.config"] --> Compose
-    AppCfg["configs/apps/$REPO/*.config"] --> Compose
+    TargetCfg["configs/targets/*.config"] --> Compose
+    AppCfg["configs/apps/common or $REPO/*.config"] --> Compose
     DriverCfg["configs/drivers/$REPO/*.config"] --> Compose
     FilesDir["optional files/"] --> Compose
     Compose --> DotConfig["openwrt/.config"]

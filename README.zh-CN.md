@@ -26,6 +26,10 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。
 | `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 | `lede` | `rockchip` | R68S、NanoPi R2S/R4S/R5C/R5S、Orange Pi R1 Plus | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 | `immortalwrt` | `x86_64` | x86_64 generic | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rpi3` | Raspberry Pi 3B/3B+ | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rpi4` | Raspberry Pi 4B | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rpi5` | Raspberry Pi 5 | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rockchip` | R68S、NanoPi R2S/R4S/R5C/R5S、Orange Pi R1 Plus | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 
 ## LuCI 插件列表
 
@@ -55,9 +59,9 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。
 | 源码标识 | 上游仓库 | 默认分支 | 说明 |
 | --- | --- | --- | --- |
 | `lede` | <https://github.com/coolsnowwolf/lede> | `master` | Lean LEDE，当前用于 standard 构建 |
-| `immortalwrt` | <https://github.com/immortalwrt/immortalwrt> | `master` | ImmortalWrt，当前用于 x86_64 lite 构建 |
+| `immortalwrt` | <https://github.com/immortalwrt/immortalwrt> | `master` | ImmortalWrt，当前用于共用 lite 构建 |
 
-两套源码的 SDK、feeds、LuCI 版本、软件包集合和插件兼容性并不完全一致，因此应用配置和插件脚本按源码隔离维护。
+两套源码的 SDK、feeds、LuCI 版本、软件包集合和插件兼容性并不完全一致。高把握可复用片段放在 `common` 下；同名的源码专属片段会优先生效。
 
 ## 工作流
 
@@ -106,23 +110,23 @@ manifests/
   builds.json            构建矩阵定义
 
 feeds/
-  lede.conf              LEDE feeds
-  immortalwrt.conf       ImmortalWrt feeds
+  common.conf            共用 feeds overlay
+  <repo>.conf            可选的源码专属 feeds overlay
 
 packages/
   lede.sh                LEDE 第三方插件
   immortalwrt.sh         ImmortalWrt 第三方插件
 
 configs/
-  targets/               按源码隔离的 target/device 配置
-  apps/                  按源码隔离的 LuCI 应用配置
+  targets/               共用 target/device 配置
+  apps/                  共用和按源码隔离的 LuCI 应用配置
   drivers/               按源码隔离的驱动扩展配置
 
 scripts/
   openwrts.mjs           Node.js CLI，用于 manifest 校验、矩阵解析和 workflow 生成
   prepare-env.sh         安装编译依赖
   clone-source.sh        拉取选定的上游源码
-  apply-openwrt.sh       应用系统默认值、按源码隔离的 feeds 和第三方插件
+  apply-openwrt.sh       应用系统默认值、共用/源码专属 feeds 和源码专属第三方插件
   compose-config.sh      合成 .config 并执行 make defconfig
   build.sh               下载依赖并编译固件
 ```
@@ -138,7 +142,7 @@ node scripts\openwrts.mjs generate-workflows
 node scripts\openwrts.mjs generate-workflows --check
 ```
 
-`generate-workflows` 会先扫描 `configs/targets/<repo>/*.config` 和 `configs/apps/<repo>/*.config`，更新 `manifests/builds.json`，再写入 workflow 下拉选项。已有 manifest 元数据，例如 `op_name`，会被保留，所以首次生成后可以再调整显示名称。
+`generate-workflows` 会扫描 `configs/targets/*.config` 下的共用 target，并结合 `configs/apps/common/*.config` 和对应 `configs/apps/<repo>/*.config` 片段，更新 `manifests/builds.json`，再写入 workflow 下拉选项。同名 app 配置优先使用源码专属片段。已有 manifest 元数据，例如 `op_name`，会被保留，所以首次生成后可以再调整显示名称。
 
 生成后的 workflow 会在 resolve 阶段检查 manifest 和 workflow 选项是否与配置片段保持同步。
 
@@ -168,7 +172,7 @@ repo + branch + cache_scope + hash(feeds/packages/scripts/configs/manifests)
 - `branch`: 留空使用 manifest 默认分支，也可以填写上游分支
 - `upload_release`: 是否上传固件到 GitHub Releases
 
-例如，`repo=lede`、`device=all`、`flavor=lite` 会用 `configs/apps/lede/lite.config` 构建所有 LEDE target。如果选择的 repo/device/flavor 组合不存在，矩阵解析会在编译前停止，并提示当前可用的 flavor。
+例如，`repo=lede`、`device=all`、`flavor=lite` 会用 `configs/apps/common/lite.config` 构建所有 LEDE target。如果选择的 repo/device/flavor 组合不存在，矩阵解析会在编译前停止，并提示当前可用的 flavor。
 
 ## 本地矩阵检查
 
@@ -183,8 +187,8 @@ Node.js CLI 只使用 Node 内置模块，不需要执行 `npm install`。
 
 ## 添加新设备
 
-1. 在 `configs/targets/<repo>/` 下添加 target/device 配置。
-2. 在 `configs/apps/<repo>/` 下添加或复用应用配置。
+1. target/device 配置统一放在 `configs/targets/`。
+2. 在 `configs/apps/common/` 或 `configs/apps/<repo>/` 下添加或复用应用配置。
 3. 如有需要，在 `configs/drivers/<repo>/` 下添加驱动扩展。
 4. 如果设备需要额外插件，更新 `packages/<repo>.sh`。
 5. 运行 `node scripts\openwrts.mjs generate-workflows`，同步 `manifests/builds.json` 和 workflow 下拉选项。

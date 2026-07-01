@@ -26,6 +26,10 @@ The firmware build list is synchronized into [`manifests/builds.json`](./manifes
 | `lede` | `rpi5` | Raspberry Pi 5 | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 | `lede` | `rockchip` | R68S, NanoPi R2S/R4S/R5C/R5S, Orange Pi R1 Plus | `standard` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 | `immortalwrt` | `x86_64` | x86_64 generic | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rpi3` | Raspberry Pi 3B/3B+ | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rpi4` | Raspberry Pi 4B | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rpi5` | Raspberry Pi 5 | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
+| `immortalwrt` | `rockchip` | R68S, NanoPi R2S/R4S/R5C/R5S, Orange Pi R1 Plus | `lite` | ![Scheduled Release](https://github.com/bigbugcc/OpenWrts/actions/workflows/schedule-release.yml/badge.svg) | ![Downloads](https://img.shields.io/github/downloads/bigbugcc/OpenWrts/total?style=flat-square) |
 
 ## LuCI Plugins
 
@@ -55,9 +59,9 @@ The firmware build list is synchronized into [`manifests/builds.json`](./manifes
 | Source ID | Upstream repository | Default branch | Notes |
 | --- | --- | --- | --- |
 | `lede` | <https://github.com/coolsnowwolf/lede> | `master` | Lean LEDE, currently used for standard builds |
-| `immortalwrt` | <https://github.com/immortalwrt/immortalwrt> | `master` | ImmortalWrt, currently used for the x86_64 lite build |
+| `immortalwrt` | <https://github.com/immortalwrt/immortalwrt> | `master` | ImmortalWrt, currently used for shared lite builds |
 
-The two sources do not share the same SDK, feeds, LuCI version, package set, or plugin compatibility guarantees. Application configs and package scripts are therefore source-specific.
+The two sources do not share the same SDK, feeds, LuCI version, package set, or plugin compatibility guarantees. High-confidence shared fragments live under `common`; source-specific fragments remain isolated and take precedence when they use the same name.
 
 ## Workflows
 
@@ -106,23 +110,23 @@ manifests/
   builds.json            build matrix definition
 
 feeds/
-  lede.conf              LEDE feeds
-  immortalwrt.conf       ImmortalWrt feeds
+  common.conf            shared feed overlays
+  <repo>.conf            optional repo-only feed overlays
 
 packages/
   lede.sh                LEDE third-party packages
   immortalwrt.sh         ImmortalWrt third-party packages
 
 configs/
-  targets/               source-specific target/device configs
-  apps/                  source-specific LuCI app configs
+  targets/               shared target/device configs
+  apps/                  common and source-specific LuCI app configs
   drivers/               source-specific driver extension configs
 
 scripts/
   openwrts.mjs           Node.js CLI for manifest validation, matrix resolution, and workflow generation
   prepare-env.sh         install build dependencies
   clone-source.sh        clone the selected upstream source
-  apply-openwrt.sh       apply system defaults, source-specific feeds, and repo packages
+  apply-openwrt.sh       apply system defaults, shared/repo feeds, and repo packages
   compose-config.sh      compose .config and run make defconfig
   build.sh               download dependencies and compile firmware
 ```
@@ -138,7 +142,7 @@ node scripts\openwrts.mjs generate-workflows
 node scripts\openwrts.mjs generate-workflows --check
 ```
 
-`generate-workflows` first scans `configs/targets/<repo>/*.config` and `configs/apps/<repo>/*.config`, updates `manifests/builds.json`, and then writes the workflow options. Existing manifest metadata such as `op_name` is preserved, so you can edit display names after the first generation.
+`generate-workflows` scans shared targets from `configs/targets/*.config`, combines them with `configs/apps/common/*.config` and selected `configs/apps/<repo>/*.config` fragments, updates `manifests/builds.json`, and then writes the workflow options. Repo-specific app fragments take precedence over same-named common app fragments. Existing manifest metadata such as `op_name` is preserved, so you can edit display names after the first generation.
 
 The generated workflows contain a validation step that fails when committed manifest or workflow options are out of sync with the config fragments.
 
@@ -168,7 +172,7 @@ Open GitHub Actions and run `Manual OpenWrt Build`, then choose:
 - `branch`: leave empty to use the manifest default, or provide an upstream branch
 - `upload_release`: whether to upload firmware to GitHub Releases
 
-For example, `repo=lede`, `device=all`, `flavor=lite` builds all LEDE targets with `configs/apps/lede/lite.config`. If a selected repo/device/flavor combination does not exist, matrix resolution stops before compilation and reports the available flavors.
+For example, `repo=lede`, `device=all`, `flavor=lite` builds all LEDE targets with `configs/apps/common/lite.config`. If a selected repo/device/flavor combination does not exist, matrix resolution stops before compilation and reports the available flavors.
 
 ## Local Matrix Checks
 
@@ -183,8 +187,8 @@ The Node.js CLI uses only built-in Node modules and does not require `npm instal
 
 ## Adding a Device
 
-1. Add the target/device config under `configs/targets/<repo>/`.
-2. Add or reuse an app config under `configs/apps/<repo>/`.
+1. Add the target/device config under `configs/targets/`.
+2. Add or reuse an app config under `configs/apps/common/` or `configs/apps/<repo>/`.
 3. Add driver extensions under `configs/drivers/<repo>/` when needed.
 4. Update `packages/<repo>.sh` if the device needs extra packages.
 5. Run `node scripts\openwrts.mjs generate-workflows` to sync `manifests/builds.json` and workflow choices.

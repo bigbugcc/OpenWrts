@@ -51,6 +51,7 @@ permissions:
 
 jobs:
   resolve:
+    name: ${{ inputs.repo == 'lede' && 'LEDE' || inputs.repo == 'immortalwrt' && 'ImmortalWrt' || 'Auto Source' }}
     runs-on: ubuntu-22.04
     outputs:
       repo: ${{ steps.matrix.outputs.repo }}
@@ -78,6 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.resolve.outputs.matrix) }}
+    name: ${{ matrix.id }} - ${{ matrix.flavor }}
     uses: ./.github/workflows/build-openwrt.yml
     with:
       repo: ${{ matrix.repo }}

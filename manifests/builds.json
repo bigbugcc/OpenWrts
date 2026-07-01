@@ -15,7 +15,7 @@
           "id": "x86_64",
           "op_name": "x86_64",
           "flavor": "standard",
-          "target_config": "configs/targets/lede/x86_64.config",
+          "target_config": "configs/targets/x86_64.config",
           "app_config": "configs/apps/lede/standard.config",
           "driver_config": "configs/drivers/lede/common.config",
           "cache_scope": "lede-x86_64-standard"
@@ -24,8 +24,8 @@
           "id": "x86_64",
           "op_name": "x86_64",
           "flavor": "lite",
-          "target_config": "configs/targets/lede/x86_64.config",
-          "app_config": "configs/apps/lede/lite.config",
+          "target_config": "configs/targets/x86_64.config",
+          "app_config": "configs/apps/common/lite.config",
           "cache_scope": "lede-x86_64-lite",
           "driver_config": "configs/drivers/lede/common.config"
         },
@@ -33,7 +33,7 @@
           "id": "rpi3",
           "op_name": "Raspberry Pi3B+",
           "flavor": "standard",
-          "target_config": "configs/targets/lede/rpi3.config",
+          "target_config": "configs/targets/rpi3.config",
           "app_config": "configs/apps/lede/standard.config",
           "driver_config": "configs/drivers/lede/common.config",
           "cache_scope": "lede-rpi3-standard"
@@ -42,8 +42,8 @@
           "id": "rpi3",
           "op_name": "Raspberry Pi3B+",
           "flavor": "lite",
-          "target_config": "configs/targets/lede/rpi3.config",
-          "app_config": "configs/apps/lede/lite.config",
+          "target_config": "configs/targets/rpi3.config",
+          "app_config": "configs/apps/common/lite.config",
           "cache_scope": "lede-rpi3-lite",
           "driver_config": "configs/drivers/lede/common.config"
         },
@@ -51,7 +51,7 @@
           "id": "rpi4",
           "op_name": "Raspberry Pi4",
           "flavor": "standard",
-          "target_config": "configs/targets/lede/rpi4.config",
+          "target_config": "configs/targets/rpi4.config",
           "app_config": "configs/apps/lede/standard.config",
           "driver_config": "configs/drivers/lede/common.config",
           "cache_scope": "lede-rpi4-standard"
@@ -60,8 +60,8 @@
           "id": "rpi4",
           "op_name": "Raspberry Pi4",
           "flavor": "lite",
-          "target_config": "configs/targets/lede/rpi4.config",
-          "app_config": "configs/apps/lede/lite.config",
+          "target_config": "configs/targets/rpi4.config",
+          "app_config": "configs/apps/common/lite.config",
           "cache_scope": "lede-rpi4-lite",
           "driver_config": "configs/drivers/lede/common.config"
         },
@@ -69,7 +69,7 @@
           "id": "rpi5",
           "op_name": "Raspberry Pi5",
           "flavor": "standard",
-          "target_config": "configs/targets/lede/rpi5.config",
+          "target_config": "configs/targets/rpi5.config",
           "app_config": "configs/apps/lede/standard.config",
           "driver_config": "configs/drivers/lede/common.config",
           "cache_scope": "lede-rpi5-standard"
@@ -78,8 +78,8 @@
           "id": "rpi5",
           "op_name": "Raspberry Pi5",
           "flavor": "lite",
-          "target_config": "configs/targets/lede/rpi5.config",
-          "app_config": "configs/apps/lede/lite.config",
+          "target_config": "configs/targets/rpi5.config",
+          "app_config": "configs/apps/common/lite.config",
           "cache_scope": "lede-rpi5-lite",
           "driver_config": "configs/drivers/lede/common.config"
         },
@@ -87,7 +87,7 @@
           "id": "rockchip",
           "op_name": "R68S-R2S-R4S-R5C-R5S-OPiR1Plus",
           "flavor": "standard",
-          "target_config": "configs/targets/lede/rockchip.config",
+          "target_config": "configs/targets/rockchip.config",
           "app_config": "configs/apps/lede/standard.config",
           "driver_config": "configs/drivers/lede/common.config",
           "cache_scope": "lede-rockchip-standard"
@@ -96,8 +96,8 @@
           "id": "rockchip",
           "op_name": "R68S-R2S-R4S-R5C-R5S-OPiR1Plus",
           "flavor": "lite",
-          "target_config": "configs/targets/lede/rockchip.config",
-          "app_config": "configs/apps/lede/lite.config",
+          "target_config": "configs/targets/rockchip.config",
+          "app_config": "configs/apps/common/lite.config",
           "cache_scope": "lede-rockchip-lite",
           "driver_config": "configs/drivers/lede/common.config"
         }
@@ -111,10 +111,46 @@
           "id": "x86_64",
           "op_name": "x86_64",
           "flavor": "lite",
-          "target_config": "configs/targets/immortalwrt/x86_64.config",
-          "app_config": "configs/apps/immortalwrt/lite.config",
+          "target_config": "configs/targets/x86_64.config",
+          "app_config": "configs/apps/common/lite.config",
           "driver_config": "configs/drivers/immortalwrt/common.config",
           "cache_scope": "immortalwrt-x86_64-lite"
+        },
+        {
+          "id": "rockchip",
+          "op_name": "R68S-R2S-R4S-R5C-R5S-OPiR1Plus",
+          "flavor": "lite",
+          "target_config": "configs/targets/rockchip.config",
+          "app_config": "configs/apps/common/lite.config",
+          "driver_config": "configs/drivers/immortalwrt/common.config",
+          "cache_scope": "immortalwrt-rockchip-lite"
+        },
+        {
+          "id": "rpi3",
+          "op_name": "Raspberry Pi3B+",
+          "flavor": "lite",
+          "target_config": "configs/targets/rpi3.config",
+          "app_config": "configs/apps/common/lite.config",
+          "driver_config": "configs/drivers/immortalwrt/common.config",
+          "cache_scope": "immortalwrt-rpi3-lite"
+        },
+        {
+          "id": "rpi4",
+          "op_name": "Raspberry Pi4",
+          "flavor": "lite",
+          "target_config": "configs/targets/rpi4.config",
+          "app_config": "configs/apps/common/lite.config",
+          "driver_config": "configs/drivers/immortalwrt/common.config",
+          "cache_scope": "immortalwrt-rpi4-lite"
+        },
+        {
+          "id": "rpi5",
+          "op_name": "Raspberry Pi5",
+          "flavor": "lite",
+          "target_config": "configs/targets/rpi5.config",
+          "app_config": "configs/apps/common/lite.config",
+          "driver_config": "configs/drivers/immortalwrt/common.config",
+          "cache_scope": "immortalwrt-rpi5-lite"
         }
       ]
     }

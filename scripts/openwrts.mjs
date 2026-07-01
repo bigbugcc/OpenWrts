@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, "..");
 const defaultManifestPath = "manifests/builds.json";
+const commonConfigRepo = "common";
 const repoDefaults = {
   lede: {
     branch: "master",
@@ -173,8 +174,8 @@ function uniqueValues(values) {
   return [...new Set(values)];
 }
 
-function sortedConfigNames(section, repo) {
-  const configDir = resolve(rootDir, "configs", section, repo);
+function sortedConfigNamesInDir(...segments) {
+  const configDir = resolve(rootDir, ...segments);
   if (!existsSync(configDir)) {
     return [];
   }
@@ -185,6 +186,14 @@ function sortedConfigNames(section, repo) {
     .sort((left, right) => left.localeCompare(right));
 }
 
+function sortedConfigNames(section, repo) {
+  return sortedConfigNamesInDir("configs", section, repo);
+}
+
+function sortedTargetConfigNames() {
+  return sortedConfigNamesInDir("configs", "targets");
+}
+
 function sortedConfigRepos(section) {
   const configDir = resolve(rootDir, "configs", section);
   if (!existsSync(configDir)) {
@@ -192,13 +201,38 @@ function sortedConfigRepos(section) {
   }
 
   return readdirSync(configDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    .filter((entry) => entry.isDirectory() && entry.name !== commonConfigRepo)
     .map((entry) => entry.name)
     .sort((left, right) => left.localeCompare(right));
 }
 
 function configPath(section, repo, name) {
   return `configs/${section}/${repo}/${name}.config`;
+}
+
+function targetConfigPath(name) {
+  return `configs/targets/${name}.config`;
+}
+
+function configPathForRepo(section, repo, name) {
+  const repoPath = configPath(section, repo, name);
+  if (existsSync(resolve(rootDir, repoPath))) {
+    return repoPath;
+  }
+
+  const commonPath = configPath(section, commonConfigRepo, name);
+  if (existsSync(resolve(rootDir, commonPath))) {
+    return commonPath;
+  }
+
+  return repoPath;
+}
+
+function configNamesForRepo(section, repo) {
+  return uniqueValues([
+    ...sortedConfigNames(section, repo),
+    ...sortedConfigNames(section, commonConfigRepo),
+  ]).sort((left, right) => left.localeCompare(right));
 }
 
 function existingOrder(values, availableValues) {
@@ -210,7 +244,7 @@ function syncManifestData(data) {
   const builds = data.builds || {};
   const repoNames = uniqueValues([
     ...Object.keys(builds),
-    ...sortedConfigRepos("targets"),
+    ...Object.keys(repoDefaults),
     ...sortedConfigRepos("apps"),
   ]);
 
@@ -223,8 +257,8 @@ function syncManifestData(data) {
   for (const repo of repoNames) {
     const repoData = builds[repo] || {};
     const existingDevices = Array.isArray(repoData.devices) ? repoData.devices : [];
-    const targetIds = sortedConfigNames("targets", repo);
-    const flavors = sortedConfigNames("apps", repo);
+    const targetIds = sortedTargetConfigNames();
+    const flavors = configNamesForRepo("apps", repo);
     const defaults = repoDefaults[repo] || {};
 
     if (targetIds.length === 0 || flavors.length === 0) {
@@ -251,7 +285,7 @@ function syncManifestData(data) {
       ...existingOrder(existingDevices.map((item) => item.flavor).filter(Boolean), flavors),
       ...flavors,
     ]);
-    const defaultDriverConfig = configPath("drivers", repo, "common");
+    const defaultDriverConfig = configPathForRepo("drivers", repo, "common");
     const hasDefaultDriver = existsSync(resolve(rootDir, defaultDriverConfig));
     const devices = [];
 
@@ -263,8 +297,8 @@ function syncManifestData(data) {
           id: targetId,
           op_name: existing.op_name || displayNamesByDevice.get(targetId) || targetId,
           flavor,
-          target_config: configPath("targets", repo, targetId),
-          app_config: configPath("apps", repo, flavor),
+          target_config: targetConfigPath(targetId),
+          app_config: configPathForRepo("apps", repo, flavor),
         };
         const driverConfig = existing.driver_config || (hasDefaultDriver ? defaultDriverConfig : "");
         if (driverConfig) {
@@ -377,6 +411,7 @@ permissions:
 
 jobs:
   resolve:
+    name: \${{ inputs.repo == 'lede' && 'LEDE' || inputs.repo == 'immortalwrt' && 'ImmortalWrt' || 'Auto Source' }}
     runs-on: ubuntu-22.04
     outputs:
       repo: \${{ steps.matrix.outputs.repo }}
@@ -404,6 +439,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: \${{ fromJSON(needs.resolve.outputs.matrix) }}
+    name: \${{ matrix.id }} - \${{ matrix.flavor }}
     uses: ./.github/workflows/build-openwrt.yml
     with:
       repo: \${{ matrix.repo }}
@@ -448,6 +484,7 @@ permissions:
 
 jobs:
   resolve:
+    name: \${{ (github.event.inputs.repo || 'auto') == 'lede' && 'LEDE' || (github.event.inputs.repo || 'auto') == 'immortalwrt' && 'ImmortalWrt' || 'Auto Source' }}
     runs-on: ubuntu-22.04
     outputs:
       repo: \${{ steps.matrix.outputs.repo }}
@@ -476,6 +513,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: \${{ fromJSON(needs.resolve.outputs.matrix) }}
+    name: \${{ matrix.id }} - \${{ matrix.flavor }}
     uses: ./.github/workflows/build-openwrt.yml
     with:
       repo: \${{ matrix.repo }}

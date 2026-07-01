@@ -45,6 +45,7 @@ concurrency:
 
 jobs:
   build:
+    name: ${{ inputs.device }} - ${{ inputs.flavor }}
     runs-on: ubuntu-22.04
     env:
       REPO: ${{ inputs.repo }}

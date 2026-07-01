@@ -2,11 +2,11 @@
 
 ## Project Role
 
-OpenWrts is an OpenWrt firmware build orchestration repository. It does not vendor OpenWrt source code. Instead, it keeps build metadata, GitHub Actions workflows, repo-specific config fragments, feeds, package clone scripts, and CI glue in one place.
+OpenWrts is an OpenWrt firmware build orchestration repository. It does not vendor OpenWrt source code. Instead, it keeps build metadata, GitHub Actions workflows, shared/repo-specific config fragments, feeds, package clone scripts, and CI glue in one place.
 
-The current design uses repo-specific config fragments under `configs/` as the scanned build inputs, `manifests/builds.json` as the generated matrix and metadata file, and `scripts/openwrts.mjs` as the Node.js control plane for manifest synchronization, validation, matrix resolution, workflow generation, and repo URL lookup.
+The current design uses shared target fragments under `configs/targets/`, shared/repo-specific app fragments under `configs/apps/`, and repo-specific driver fragments under `configs/drivers/` as the scanned build inputs. `manifests/builds.json` is the generated matrix and metadata file, and `scripts/openwrts.mjs` is the Node.js control plane for manifest synchronization, validation, matrix resolution, workflow generation, and repo URL lookup.
 
-Application config fragments are intentionally split by both source repo and flavor, for example `configs/apps/lede/standard.config` and `configs/apps/immortalwrt/lite.config`. This is because LEDE and ImmortalWrt do not have identical package sets or LuCI compatibility. The manual workflow uses a static global flavor selector, so its default is pinned to the valid `lede` + `standard` combination instead of `all`.
+Application config fragments can be shared by flavor, for example `configs/apps/common/lite.config`, while source-specific variants such as `configs/apps/lede/standard.config` stay isolated. This is because LEDE and ImmortalWrt do not have identical package sets or LuCI compatibility. The manual workflow uses a static global flavor selector, so its default is pinned to the valid `lede` + `standard` combination instead of `all`.
 
 ## Architecture
 
@@ -26,15 +26,15 @@ flowchart LR
     Clone --> Upstream["LEDE / ImmortalWrt source"]
 
     Reusable --> ApplyBase["apply-openwrt.sh system feeds"]
-    FeedsCfg["feeds/<repo>.conf"] --> ApplyBase
+    FeedsCfg["feeds/common.conf + feeds/<repo>.conf"] --> ApplyBase
     ApplyBase --> FeedUpdate["OpenWrt feeds update/install"]
 
     Reusable --> ApplyPkgs["apply-openwrt.sh packages"]
     PkgScript["packages/<repo>.sh"] --> ApplyPkgs
 
     Reusable --> Config["compose-config.sh"]
-    TargetCfg["configs/targets/<repo>/<device>.config"] --> Config
-    AppCfg["configs/apps/<repo>/<flavor>.config"] --> Config
+    TargetCfg["configs/targets/<device>.config"] --> Config
+    AppCfg["configs/apps/common or <repo>/<flavor>.config"] --> Config
     DriverCfg["configs/drivers/<repo>/common.config"] --> Config
     Config --> DotConfig["openwrt/.config + make defconfig"]
 
@@ -76,19 +76,19 @@ sequenceDiagram
 
 | Area | Files | Responsibility |
 | --- | --- | --- |
-| Build metadata | `configs/**`, `manifests/builds.json` | Config fragments define target/app combinations. The generated manifest stores repos, upstream URLs, branches, display names, config paths, and cache scopes. |
+| Build metadata | `configs/**`, `manifests/builds.json` | Shared target fragments plus shared/repo-specific app fragments define build combinations. The generated manifest stores repos, upstream URLs, branches, display names, config paths, and cache scopes. |
 | Node control plane | `scripts/openwrts.mjs` | Validates the manifest, resolves build matrices, generates static workflow choices, and returns repo URLs. |
 | Entrypoint workflows | `.github/workflows/manual-build.yml`, `.github/workflows/schedule-release.yml` | Static GitHub Actions UI entrypoints generated from the manifest. |
 | Reusable build workflow | `.github/workflows/build-openwrt.yml` | Builds one resolved matrix item and uploads artifacts/releases. |
 | Build dependencies | `scripts/prepare-env.sh` | Installs Ubuntu packages required by the selected upstream source. |
 | Source clone | `scripts/clone-source.sh` | Uses `openwrts.mjs repo-url` plus `REPO_BRANCH` to clone the selected upstream source. |
-| OpenWrt apply step | `scripts/apply-openwrt.sh` | Applies default system settings, repo-specific feeds, and repo package scripts. |
+| OpenWrt apply step | `scripts/apply-openwrt.sh` | Applies default system settings, shared/repo-specific feeds, and repo package scripts. |
 | Config composition | `scripts/compose-config.sh` | Merges target, driver, and app config fragments into OpenWrt `.config`. |
 | Compilation | `scripts/build.sh` | Runs OpenWrt download, tools, toolchain, target, packages, and image phases. |
 
 ## Manifest Model
 
-`generate-workflows` scans `configs/targets/<repo>/*.config` and `configs/apps/<repo>/*.config` to synchronize the device/flavor matrix into `manifests/builds.json`. Existing generated manifest metadata is preserved where possible, including custom `op_name` values.
+`generate-workflows` scans `configs/targets/*.config`, `configs/apps/common/*.config`, and repo-specific app fragments to synchronize the device/flavor matrix into `manifests/builds.json`. Repo-specific app fragments take precedence over same-named common app fragments. Existing generated manifest metadata is preserved where possible, including custom `op_name` values.
 
 Each repo entry in `manifests/builds.json` contains:
 
@@ -139,8 +139,8 @@ Full OpenWrt builds are network-heavy and should normally run in GitHub Actions.
 
 When adding a device:
 
-1. Add or reuse config fragments under `configs/targets/<repo>/`, `configs/apps/<repo>/`, and `configs/drivers/<repo>/`.
-2. Update `packages/<repo>.sh` or `feeds/<repo>.conf` only if the device needs additional package sources.
+1. Add or reuse config fragments under `configs/targets/`, `configs/apps/common/`, `configs/apps/<repo>/`, and `configs/drivers/<repo>/`.
+2. Update `packages/<repo>.sh`, `feeds/common.conf`, or `feeds/<repo>.conf` only if the device needs additional package sources.
 3. Run `node scripts\openwrts.mjs generate-workflows` to sync `manifests/builds.json` and workflow choices.
 4. Optionally adjust generated manifest metadata such as `op_name`, then rerun `generate-workflows`.
 5. Run `node scripts\openwrts.mjs validate-manifest`.

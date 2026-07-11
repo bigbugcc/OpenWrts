@@ -63,11 +63,14 @@ OpenWrts 是一个基于 GitHub Actions 的 OpenWrt 云编译仓库。
 
 两套源码的 SDK、feeds、LuCI 版本、软件包集合和插件兼容性并不完全一致。高把握可复用片段放在 `common` 下；同名的源码专属片段会优先生效。
 
+> [!WARNING]
+> 不同固件源构建的固件不能混用升级。即使设备和 flavor 名称相同，也不要使用 LEDE 固件对 ImmortalWrt 进行保留配置升级或直接覆盖升级，反向操作同样不支持。需要切换固件源时，请先单独备份必要设置，按照对应设备的 factory/recovery 流程进行全新刷写，再选择性恢复兼容配置；不要恢复另一个固件源生成的完整配置备份。
+
 ## 工作流
 
 | Workflow | 用途 |
 | --- | --- |
-| [`schedule-release.yml`](./.github/workflows/schedule-release.yml) | 定时发布。`auto` 模式会按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间轮换 |
+| [`schedule-release.yml`](./.github/workflows/schedule-release.yml) | 可筛选源码、设备和风格的定时发布。`auto` 按 ISO 周奇偶在 LEDE 和 ImmortalWrt 之间选择一个源码 |
 | [`manual-build.yml`](./.github/workflows/manual-build.yml) | 手动构建入口，可选择源码、设备、风格、分支和是否发布 |
 | [`build-openwrt.yml`](./.github/workflows/build-openwrt.yml) | reusable workflow，负责构建单个 matrix 项 |
 
@@ -79,6 +82,8 @@ schedule:
 ```
 
 约等于 Asia/Shanghai 时区的周日 00:23。
+
+定时构建默认使用 `repo=auto`、`devices=all`、`flavors=lite`。手动运行该定时 workflow 时，`devices` 和 `flavors` 支持逗号分隔多选，例如 `rpi3,rpi5` 和 `lite,standard`。设备值使用 `configs/targets/` 下不带 `.config` 后缀的配置名。
 
 ## 构建流程
 
@@ -166,7 +171,7 @@ repo + branch + cache_scope + hash(feeds/packages/scripts/configs/manifests)
 
 进入 GitHub Actions，运行 `Manual OpenWrt Build`，然后选择：
 
-- `repo`: `auto`、`lede` 或 `immortalwrt`。选择 `auto` 时会根据设备自动匹配源码；当 `device=all` 时，`auto` 使用定时轮换规则。
+- `repo`: `auto`、`lede` 或 `immortalwrt`。`auto` 始终按定时任务的 ISO 周轮换规则选择一个源码。
 - `device`: `all` 或构建矩阵里的设备 ID
 - `flavor`: `standard`、`lite` 或 `all`。默认是 `repo=lede` 搭配 `standard`。`all` 表示构建所选 repo/device 下所有匹配的 manifest 条目。
 - `branch`: 留空使用 manifest 默认分支，也可以填写上游分支

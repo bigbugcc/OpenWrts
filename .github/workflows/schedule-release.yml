@@ -14,6 +14,16 @@ on:
           - lede
           - immortalwrt
         default: auto
+      devices:
+        description: Target config names, comma-separated for multiple devices, or all.
+        required: true
+        type: string
+        default: "all"
+      flavors:
+        description: Firmware flavors, comma-separated for multiple flavors, or all.
+        required: true
+        type: string
+        default: "lite"
       upload_release:
         description: Upload firmware to GitHub Releases.
         required: true
@@ -46,9 +56,14 @@ jobs:
         id: matrix
         env:
           REQUESTED_REPO: ${{ github.event.inputs.repo || 'auto' }}
+          REQUESTED_DEVICES: ${{ github.event.inputs.devices || 'all' }}
+          REQUESTED_FLAVORS: ${{ github.event.inputs.flavors || 'lite' }}
           REQUESTED_UPLOAD_RELEASE: ${{ github.event.inputs.upload_release || 'true' }}
         run: |
-          node scripts/openwrts.mjs resolve-matrix --repo "$REQUESTED_REPO"
+          node scripts/openwrts.mjs resolve-matrix \
+            --repo "$REQUESTED_REPO" \
+            --devices "$REQUESTED_DEVICES" \
+            --flavors "$REQUESTED_FLAVORS"
           echo "upload_release=$REQUESTED_UPLOAD_RELEASE" >> "$GITHUB_OUTPUT"
 
   build:

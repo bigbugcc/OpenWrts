@@ -8,7 +8,7 @@
 flowchart TD
     ManualTrigger["手动触发<br/>manual-build.yml<br/>workflow_dispatch"] --> ManualInputs["repo/device/flavor/branch/upload_release"]
     ScheduleTrigger["定时触发<br/>schedule-release.yml<br/>cron: 23 16 * * 6"] --> ScheduleResolveJob
-    ScheduledDispatch["手动触发<br/>schedule-release.yml<br/>workflow_dispatch"] --> ScheduleInputs["repo/upload_release"]
+    ScheduledDispatch["手动触发<br/>schedule-release.yml<br/>workflow_dispatch"] --> ScheduleInputs["repo/devices/flavors/upload_release"]
 
     ManualInputs --> ManualResolveJob["manual-build.yml<br/>jobs.resolve"]
     ScheduleInputs --> ScheduleResolveJob["schedule-release.yml<br/>jobs.resolve"]
@@ -184,7 +184,7 @@ flowchart TD
 | `manual-build.yml` | `node scripts/openwrts.mjs validate-manifest` | Validate manifest before resolving manual matrix. |
 | `manual-build.yml` | `node scripts/openwrts.mjs generate-workflows --check` | Ensure generated workflow options are committed. |
 | `manual-build.yml` | `node scripts/openwrts.mjs resolve-matrix` | Convert manual inputs into matrix JSON. |
-| `schedule-release.yml` | `node scripts/openwrts.mjs resolve-matrix` | Resolve scheduled repo rotation or selected repo. |
+| `schedule-release.yml` | `node scripts/openwrts.mjs resolve-matrix` | Resolve one scheduled/selected repo and filter comma-separated devices/flavors. |
 | `build-openwrt.yml` | `scripts/prepare-env.sh` | Install build dependencies. |
 | `build-openwrt.yml` | `scripts/clone-source.sh` | Clone selected upstream OpenWrt source. |
 | `scripts/clone-source.sh` | `node scripts/openwrts.mjs repo-url` | Resolve upstream URL from manifest. |

@@ -151,8 +151,12 @@ jobs:
       - name: Generate release body
         if: ${{ inputs.upload_release }}
         run: |
-          release_tag="${{ inputs.repo }}-${{ inputs.device }}-${{ steps.organize.outputs.file_date }}"
-          release_name="OpenWrt-${{ inputs.repo }}-${{ inputs.op_name }}-${{ inputs.flavor }}"
+          release_tag="${{ inputs.repo }}-${{ inputs.device }}-${{ inputs.flavor }}-${{ github.run_id }}-${{ github.run_attempt }}"
+          release_name="${{ inputs.repo }}-${{ inputs.op_name }} - ${{ inputs.flavor }}"
+          if [ "${#release_tag}" -gt 240 ] || ! git check-ref-format "refs/tags/$release_tag"; then
+            echo "Invalid or overly long release tag (${#release_tag} characters): $release_tag" >&2
+            exit 1
+          fi
           echo "RELEASE_TAG=$release_tag" >> "$GITHUB_ENV"
           echo "RELEASE_NAME=$release_name" >> "$GITHUB_ENV"
           {

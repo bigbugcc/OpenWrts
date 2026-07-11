@@ -63,11 +63,14 @@ The firmware build list is synchronized into [`manifests/builds.json`](./manifes
 
 The two sources do not share the same SDK, feeds, LuCI version, package set, or plugin compatibility guarantees. High-confidence shared fragments live under `common`; source-specific fragments remain isolated and take precedence when they use the same name.
 
+> [!WARNING]
+> Firmware built from different sources must not be mixed during upgrades. Do not use a LEDE image to perform an in-place or keep-settings upgrade on ImmortalWrt, or vice versa, even when the device and flavor names match. To switch sources, back up the required settings separately, perform a clean installation using the device-appropriate factory/recovery procedure, and then restore only compatible settings. Do not restore a complete configuration archive from the other source.
+
 ## Workflows
 
 | Workflow | Purpose |
 | --- | --- |
-| [`schedule-release.yml`](./.github/workflows/schedule-release.yml) | Scheduled release. `auto` mode alternates between LEDE and ImmortalWrt by ISO week parity |
+| [`schedule-release.yml`](./.github/workflows/schedule-release.yml) | Scheduled release with source, device, and flavor filters. `auto` alternates one source between LEDE and ImmortalWrt by ISO week parity |
 | [`manual-build.yml`](./.github/workflows/manual-build.yml) | Manual build entry point with source, device, flavor, branch, and release controls |
 | [`build-openwrt.yml`](./.github/workflows/build-openwrt.yml) | Reusable workflow that builds one matrix item |
 
@@ -79,6 +82,8 @@ schedule:
 ```
 
 This is roughly Sunday 00:23 in Asia/Shanghai.
+
+The scheduled build defaults to `repo=auto`, `devices=all`, and `flavors=lite`. For a manual run of the scheduled workflow, `devices` and `flavors` accept comma-separated values, for example `rpi3,rpi5` and `lite,standard`. Device values are config names under `configs/targets/` without the `.config` suffix.
 
 ## Build Flow
 
@@ -166,7 +171,7 @@ This avoids reusing incompatible cache data across LEDE, ImmortalWrt, devices, a
 
 Open GitHub Actions and run `Manual OpenWrt Build`, then choose:
 
-- `repo`: `auto`, `lede`, or `immortalwrt`. Use `auto` to resolve the source from the selected device; for `device=all`, `auto` follows the scheduled rotation rule.
+- `repo`: `auto`, `lede`, or `immortalwrt`. `auto` always selects one source using the scheduled ISO-week rotation rule.
 - `device`: `all` or a device ID from the matrix
 - `flavor`: `standard`, `lite`, or `all`. The default is `standard` with `repo=lede`. Use `all` when you want every matching manifest entry for the selected repo/device.
 - `branch`: leave empty to use the manifest default, or provide an upstream branch

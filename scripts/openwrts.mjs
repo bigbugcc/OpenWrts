@@ -20,7 +20,7 @@ const repoDefaults = {
 
 function usage() {
   console.error(`Usage:
-  node scripts/openwrts.mjs resolve-matrix [--manifest path] [--repo auto|lede|immortalwrt] [--device all|id] [--flavor all|name] [--branch name]
+  node scripts/openwrts.mjs resolve-matrix [--manifest path] [--repo auto|lede|immortalwrt] [--device all|id | --devices all|id,id] [--flavor all|name | --flavors all|name,name] [--branch name]
   node scripts/openwrts.mjs validate-manifest [--manifest path]
   node scripts/openwrts.mjs generate-workflows [--manifest path] [--check]
   node scripts/openwrts.mjs repo-url --repo lede|immortalwrt [--manifest path]`);
@@ -65,6 +65,11 @@ function defaultManifest() {
         default_device: "all",
         default_flavor: "standard",
       },
+      schedule: {
+        default_repo: "auto",
+        default_devices: "all",
+        default_flavors: "lite",
+      },
     },
     builds: {},
   };
@@ -89,16 +94,36 @@ function scheduledRepo(now = new Date()) {
   return week % 2 === 0 ? "lede" : "immortalwrt";
 }
 
-function matchingItems(data, repoNames, device, flavor) {
+function parseSelection(value, label) {
+  const selection = uniqueValues(
+    String(value || "all")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean),
+  );
+
+  if (selection.length === 0) {
+    return ["all"];
+  }
+  if (selection.includes("all") && selection.length > 1) {
+    throw new Error(`${label} cannot combine 'all' with other values.`);
+  }
+
+  return selection;
+}
+
+function matchingItems(data, repoNames, devices, flavors) {
   const include = [];
+  const allDevices = devices.includes("all");
+  const allFlavors = flavors.includes("all");
 
   for (const repo of repoNames) {
     const repoData = data.builds[repo];
     for (const item of repoData.devices || []) {
-      if (device !== "all" && item.id !== device) {
+      if (!allDevices && !devices.includes(item.id)) {
         continue;
       }
-      if (flavor !== "all" && (item.flavor || "") !== flavor) {
+      if (!allFlavors && !flavors.includes(item.flavor || "")) {
         continue;
       }
 
@@ -117,40 +142,47 @@ function formatMatches(matches) {
   return matches.map((item) => `${item.repo}/${item.id}[${item.flavor || "unknown"}]`).join(", ");
 }
 
-function availableMatches(data, repoNames, device, flavor) {
-  return formatMatches(matchingItems(data, repoNames, device, flavor));
+function availableMatches(data, repoNames, devices, flavors) {
+  return formatMatches(matchingItems(data, repoNames, devices, flavors));
 }
 
 function resolveMatrix(args) {
   const { data } = readManifest(args.manifest);
   const repoArg = args.repo || "auto";
-  const device = args.device || "all";
-  const flavor = args.flavor || "all";
+  const devices = parseSelection(args.devices === undefined ? args.device : args.devices, "devices");
+  const flavors = parseSelection(args.flavors === undefined ? args.flavor : args.flavors, "flavors");
   const branchOverride = args.branch === true ? "" : args.branch || "";
 
   if (repoArg !== "auto" && !data.builds[repoArg]) {
     throw new Error(`Unknown repo '${repoArg}'.`);
   }
 
-  let repoNames;
-  if (repoArg === "auto" && device !== "all") {
-    repoNames = Object.keys(data.builds);
-  } else {
-    const repo = repoArg === "auto" ? scheduledRepo() : repoArg;
-    repoNames = [repo];
+  const repo = repoArg === "auto" ? scheduledRepo() : repoArg;
+  const repoNames = [repo];
+  const repoItems = repoNames.flatMap((repoName) => data.builds[repoName].devices || []);
+  const knownDevices = uniqueValues(repoItems.map((item) => item.id));
+  const knownFlavors = uniqueValues(repoItems.map((item) => item.flavor).filter(Boolean));
+  const unknownDevices = devices.filter((item) => item !== "all" && !knownDevices.includes(item));
+  const unknownFlavors = flavors.filter((item) => item !== "all" && !knownFlavors.includes(item));
+
+  if (unknownDevices.length > 0) {
+    throw new Error(`Unknown devices for repo=${repo}: ${unknownDevices.join(", ")}. Available devices: ${knownDevices.join(", ")}.`);
+  }
+  if (unknownFlavors.length > 0) {
+    throw new Error(`Unknown flavors for repo=${repo}: ${unknownFlavors.join(", ")}. Available flavors: ${knownFlavors.join(", ")}.`);
   }
 
-  const include = matchingItems(data, repoNames, device, flavor);
+  const include = matchingItems(data, repoNames, devices, flavors);
   for (const item of include) {
     const repoData = data.builds[item.repo];
     item.branch = branchOverride || repoData.branch || "master";
   }
 
   if (include.length === 0) {
-    const alternatives = availableMatches(data, repoNames, device, "all");
-    const availableFlavors = uniqueValues(matchingItems(data, repoNames, device, "all").map((item) => item.flavor)).join(", ") || "none";
+    const alternatives = availableMatches(data, repoNames, devices, ["all"]);
+    const availableFlavors = uniqueValues(matchingItems(data, repoNames, devices, ["all"]).map((item) => item.flavor)).join(", ") || "none";
     throw new Error(
-      `No builds matched repo=${repoArg}, device=${device}, flavor=${flavor}. ` +
+      `No builds matched repo=${repoArg}, devices=${devices.join(",")}, flavors=${flavors.join(",")}. ` +
         `Available builds for this repo/device: ${alternatives}. ` +
         `Available flavors: ${availableFlavors}.`,
     );
@@ -356,6 +388,15 @@ function manualDefaults(data, values) {
   };
 }
 
+function scheduledDefaults(data, values) {
+  const configured = data.workflow?.schedule || {};
+  return {
+    repo: configured.default_repo || "auto",
+    devices: configured.default_devices || "all",
+    flavors: configured.default_flavors || (values.flavors.includes("lite") ? "lite" : values.flavors[0]),
+  };
+}
+
 function yamlOptions(values, indent = 10) {
   const pad = " ".repeat(indent);
   return values.map((value) => `${pad}- ${value}`).join("\n");
@@ -375,7 +416,7 @@ on:
   workflow_dispatch:
     inputs:
       repo:
-        description: Source repo to build. Use auto to resolve by device.
+        description: Source repo to build. Auto selects one repo using the scheduled rotation.
         required: true
         type: choice
         options:
@@ -458,6 +499,7 @@ jobs:
 
 function scheduledWorkflow(data) {
   const values = manifestValues(data);
+  const defaults = scheduledDefaults(data, values);
 
   return `${generatedHeader()}name: Scheduled OpenWrt Release
 
@@ -470,7 +512,17 @@ on:
         type: choice
         options:
 ${yamlOptions(values.repos)}
-        default: auto
+        default: ${defaults.repo}
+      devices:
+        description: Target config names, comma-separated for multiple devices, or all.
+        required: true
+        type: string
+        default: "${defaults.devices}"
+      flavors:
+        description: Firmware flavors, comma-separated for multiple flavors, or all.
+        required: true
+        type: string
+        default: "${defaults.flavors}"
       upload_release:
         description: Upload firmware to GitHub Releases.
         required: true
@@ -484,7 +536,7 @@ permissions:
 
 jobs:
   resolve:
-    name: \${{ (github.event.inputs.repo || 'auto') == 'lede' && 'LEDE' || (github.event.inputs.repo || 'auto') == 'immortalwrt' && 'ImmortalWrt' || 'Auto Source' }}
+    name: \${{ (github.event.inputs.repo || '${defaults.repo}') == 'lede' && 'LEDE' || (github.event.inputs.repo || '${defaults.repo}') == 'immortalwrt' && 'ImmortalWrt' || 'Auto Source' }}
     runs-on: ubuntu-22.04
     outputs:
       repo: \${{ steps.matrix.outputs.repo }}
@@ -502,10 +554,15 @@ jobs:
       - name: Resolve scheduled build matrix
         id: matrix
         env:
-          REQUESTED_REPO: \${{ github.event.inputs.repo || 'auto' }}
+          REQUESTED_REPO: \${{ github.event.inputs.repo || '${defaults.repo}' }}
+          REQUESTED_DEVICES: \${{ github.event.inputs.devices || '${defaults.devices}' }}
+          REQUESTED_FLAVORS: \${{ github.event.inputs.flavors || '${defaults.flavors}' }}
           REQUESTED_UPLOAD_RELEASE: \${{ github.event.inputs.upload_release || 'true' }}
         run: |
-          node scripts/openwrts.mjs resolve-matrix --repo "$REQUESTED_REPO"
+          node scripts/openwrts.mjs resolve-matrix \\
+            --repo "$REQUESTED_REPO" \\
+            --devices "$REQUESTED_DEVICES" \\
+            --flavors "$REQUESTED_FLAVORS"
           echo "upload_release=$REQUESTED_UPLOAD_RELEASE" >> "$GITHUB_OUTPUT"
 
   build:
@@ -585,6 +642,7 @@ function validateManifestData(data) {
   const errors = [];
   const values = manifestValues(data);
   const defaults = manualDefaults(data, values);
+  const scheduleDefaults = scheduledDefaults(data, values);
 
   if (!values.repos.includes(defaults.repo)) {
     errors.push(`workflow.manual.default_repo must be one of: ${values.repos.join(", ")}`);
@@ -594,6 +652,19 @@ function validateManifestData(data) {
   }
   if (!values.flavors.includes(defaults.flavor)) {
     errors.push(`workflow.manual.default_flavor must be one of: ${values.flavors.join(", ")}`);
+  }
+  if (!values.repos.includes(scheduleDefaults.repo)) {
+    errors.push(`workflow.schedule.default_repo must be one of: ${values.repos.join(", ")}`);
+  }
+  for (const device of parseSelection(scheduleDefaults.devices, "workflow.schedule.default_devices")) {
+    if (!values.devices.includes(device)) {
+      errors.push(`workflow.schedule.default_devices contains unknown device '${device}'`);
+    }
+  }
+  for (const flavor of parseSelection(scheduleDefaults.flavors, "workflow.schedule.default_flavors")) {
+    if (!values.flavors.includes(flavor)) {
+      errors.push(`workflow.schedule.default_flavors contains unknown flavor '${flavor}'`);
+    }
   }
 
   for (const [repo, repoData] of Object.entries(data.builds)) {

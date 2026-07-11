@@ -96,7 +96,9 @@ Each repo entry in `manifests/builds.json` contains:
 - `url`: upstream Git repository URL used by `clone-source.sh`.
 - `devices`: build targets for that source repo.
 
-The optional `workflow.manual` section controls static defaults used when generating `manual-build.yml`, including `default_repo`, `default_device`, and `default_flavor`.
+The optional `workflow.manual` section controls static defaults used when generating `manual-build.yml`, including `default_repo`, `default_device`, and `default_flavor`. The `workflow.schedule` section controls the scheduled defaults for `repo`, comma-separated `devices`, and comma-separated `flavors`; the current policy is `auto`, all devices, and `lite`.
+
+`repo=auto` always resolves to one source using ISO-week rotation. It no longer expands a selected device across every repository.
 
 Each device entry contains:
 

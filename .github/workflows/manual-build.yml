@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       repo:
-        description: Source repo to build. Use auto to resolve by device.
+        description: Source repo to build. Auto selects one repo using the scheduled rotation.
         required: true
         type: choice
         options:

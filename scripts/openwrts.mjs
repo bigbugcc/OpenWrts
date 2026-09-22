@@ -465,6 +465,7 @@ jobs:
         run: |
           node scripts/openwrts.mjs validate-manifest
           node scripts/openwrts.mjs generate-workflows --check
+          bash tests/apply-openwrt-feeds.sh
 
       - name: Resolve manual build matrix
         id: matrix
@@ -550,6 +551,7 @@ jobs:
         run: |
           node scripts/openwrts.mjs validate-manifest
           node scripts/openwrts.mjs generate-workflows --check
+          bash tests/apply-openwrt-feeds.sh
 
       - name: Resolve scheduled build matrix
         id: matrix

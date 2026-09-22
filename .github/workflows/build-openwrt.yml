@@ -53,6 +53,8 @@ jobs:
       TZ: Asia/Shanghai
       OPENWRT_DIR: /mnt/workdir/openwrt
       CCACHE_DIR: /mnt/workdir/openwrt/.ccache
+      # Bump this value whenever the set of safe cache paths changes.
+      CACHE_SCHEMA: v2
 
     steps:
       - name: Checkout
@@ -79,14 +81,17 @@ jobs:
           ln -sf /mnt/workdir/openwrt "$GITHUB_WORKSPACE/openwrt"
 
       - name: Cache downloads and ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             /mnt/workdir/openwrt/dl
+            !/mnt/workdir/openwrt/dl/go-mod-cache
             /mnt/workdir/openwrt/.ccache
-          key: openwrt-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.cache_scope }}-${{ hashFiles('feeds/**', 'packages/**', 'scripts/**', 'configs/**', 'manifests/**') }}
+          # Go module trees are mutable and can be left incomplete by an interrupted
+          # download. Do not restore or persist them; Go will repopulate them safely.
+          key: openwrt-${{ env.CACHE_SCHEMA }}-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.cache_scope }}-${{ hashFiles('feeds/**', 'packages/**', 'scripts/**', 'configs/**', 'manifests/**') }}
           restore-keys: |
-            openwrt-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.cache_scope }}-
+            openwrt-${{ env.CACHE_SCHEMA }}-${{ inputs.repo }}-${{ inputs.branch }}-${{ inputs.cache_scope }}-
 
       - name: Apply system settings and feeds
         run: |

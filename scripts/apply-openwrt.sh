@@ -49,6 +49,65 @@ apply_system() {
   echo "Default LAN IP changed to 192.168.10.1"
 }
 
+append_unique_feeds() {
+  local source_file="$1"
+  local target_file="$2"
+  local line
+  local feed_type
+  local feed_name
+  local feed_source
+  local match
+  local added=0
+  local skipped=0
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    if [[ "$line" =~ ^[[:space:]]*$ || "$line" =~ ^[[:space:]]*# ]]; then
+      continue
+    fi
+
+    read -r feed_type feed_name feed_source _ <<< "$line"
+    if [[ ! "$feed_type" =~ ^src-[^[:space:]]+$ || -z "$feed_name" || -z "$feed_source" ]]; then
+      echo "Error: invalid feed entry in $source_file: $line" >&2
+      return 1
+    fi
+
+    if match="$(awk -v wanted_name="$feed_name" -v wanted_source="$feed_source" '
+      function normalize_source(source) {
+        sub(/;.*/, "", source)
+        sub(/\/+$/, "", source)
+        sub(/\.git$/, "", source)
+        return source
+      }
+
+      /^[[:space:]]*#/ { next }
+      $1 ~ /^src-[^[:space:]]+$/ && NF >= 3 {
+        if ($2 == wanted_name) {
+          print "feed name " wanted_name
+          found = 1
+          exit
+        }
+        if (normalize_source($3) == normalize_source(wanted_source)) {
+          print "source " $3
+          found = 1
+          exit
+        }
+      }
+
+      END { exit !found }
+    ' "$target_file")"; then
+      echo "Skipped feed '$feed_name' from $source_file: existing $match"
+      skipped=$((skipped + 1))
+      continue
+    fi
+
+    printf '%s\n' "$line" >> "$target_file"
+    echo "Added feed '$feed_name' from $source_file"
+    added=$((added + 1))
+  done < "$source_file"
+
+  echo "Processed feeds from $source_file: added=$added skipped=$skipped"
+}
+
 apply_feeds() {
   local openwrt_dir="$1"
   local common_feeds_file="$ROOT_DIR/feeds/common.conf"
@@ -62,14 +121,12 @@ apply_feeds() {
   fi
 
   if [ -f "$common_feeds_file" ]; then
-    cat "$common_feeds_file" >> "$target_feeds"
-    echo "Applied shared feeds from $common_feeds_file"
+    append_unique_feeds "$common_feeds_file" "$target_feeds"
     applied=1
   fi
 
   if [ -f "$feeds_file" ]; then
-    cat "$feeds_file" >> "$target_feeds"
-    echo "Applied feeds for REPO=$REPO from $feeds_file"
+    append_unique_feeds "$feeds_file" "$target_feeds"
     applied=1
   fi
 
